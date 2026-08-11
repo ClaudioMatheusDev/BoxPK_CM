@@ -12,7 +12,7 @@ namespace Domain.Entities
         public int IDJogoTCG { get; set; } 
         public DateTime DataLancamento { get; set; }
         public StatusColecao StatusColecao { get; set; }
-        public DateTime DataInclusao { get; set; } = DateTime.Now.AddHours(-3);
+        public DateTime DataInclusao { get; set; } = DateTime.Now;
         public DateTime DataAlteracao { get; set; }
     }
 }

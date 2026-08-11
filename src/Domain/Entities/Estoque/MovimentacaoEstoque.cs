@@ -14,6 +14,6 @@ namespace Domain.Entities
         public int QuantidadePosterior { get; set; }
         public string? Motivo { get; set; }
         public string? Observacao { get; set; }
-        public DateTime DataMovimentacao { get; set; } = DateTime.Now.AddHours(-3);
+        public DateTime DataMovimentacao { get; set; } = DateTime.Now;
     }
 }

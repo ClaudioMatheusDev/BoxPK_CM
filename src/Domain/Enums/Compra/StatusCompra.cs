@@ -2,7 +2,8 @@
 {
     public enum StatusCompra
     {
-        Confirmada = 1,
-        Cancelada = 2
+        Pendente = 1,
+        Confirmada = 2,
+        Cancelada = 3
     }
 }

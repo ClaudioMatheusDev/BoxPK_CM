@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{5D448A39-A7DA-42C0-BCE5-4FABD5834245}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{80C33E66-D1F5-4644-AAD6-607C04FC4AE7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A3E27C16-6FBB-4D18-BC64-CC1082668CDD} = {A3E27C16-6FBB-4D18-BC64-CC1082668CDD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,5 +75,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87B627D1-C1C7-4265-B0D2-FD4633B939CA}
 	EndGlobalSection
 EndGlobal
