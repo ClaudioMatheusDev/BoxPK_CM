@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Data;
 using WebApi.Service;
+using WebApi.Service.Auth;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Application.Dtos;
+using Application.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,21 +20,53 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddFluentValidationAutoValidation();
-
 builder.Services.AddValidatorsFromAssemblyContaining<ItemCompraAtualizarDtoValidator>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PermitirReact", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",
-                "http://127.0.0.1:5173")
+        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+var jwtKey = builder.Configuration["Jwt:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "BoxPK_CM";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "BoxPK_CMClients";
+
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new InvalidOperationException("Configuração 'Jwt:Key' não encontrada ou vazia.");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
+
+builder.Services.AddAuthorization();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IFornecedorService, FornecedorService>();
@@ -43,7 +82,6 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-
 if (app.Configuration.GetValue<bool>("APPLY_MIGRATIONS"))
 {
     using var scope = app.Services.CreateScope();
@@ -51,18 +89,16 @@ if (app.Configuration.GetValue<bool>("APPLY_MIGRATIONS"))
     await dbContext.Database.MigrateAsync();
 }
 
-
 app.UseCors("PermitirReact");
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 }
 
 //app.UseHttpsRedirection();
-
 
 app.Run();
 

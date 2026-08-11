@@ -1,4 +1,5 @@
 ﻿using Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
 
@@ -6,6 +7,7 @@ namespace WebApi.Controllers.Compra.ItemCompra
 {
     [ApiController]
     [Route("api/itemcompra")]
+    [Authorize]
     public class ItemCompraController : Controller
     {
         private readonly IItemCompraService _service;

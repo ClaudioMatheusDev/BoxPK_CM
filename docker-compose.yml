@@ -24,6 +24,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       APPLY_MIGRATIONS: "true"
+      Jwt__Key: ${Jwt__Key}
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=BoxPK_CM;User Id=sa;Password=${SA_PASSWORD};Encrypt=False;TrustServerCertificate=True
     ports:
       - "5236:5160"

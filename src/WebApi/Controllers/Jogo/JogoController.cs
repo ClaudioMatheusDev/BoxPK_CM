@@ -1,5 +1,6 @@
 ﻿using Application.Dtos;
 using Application.Dtos.Jogo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
 
@@ -7,6 +8,7 @@ namespace WebApi.Controllers.Jogo
 {
     [ApiController]
     [Route("api/jogo")]
+    [Authorize]
     public class JogoController : Controller
     {
 

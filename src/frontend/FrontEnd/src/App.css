@@ -110,6 +110,25 @@
   background: #dbeafe;
 }
 
+.logout-button {
+  width: calc(100% - 32px);
+  min-height: 42px;
+  position: absolute;
+  left: 16px;
+  bottom: 18px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  color: #344054;
+  background: #ffffff;
+  cursor: pointer;
+  font: 800 14px/1 var(--sans);
+}
+
+.logout-button:hover {
+  color: #b42318;
+  background: #fff5f5;
+}
+
 .content {
   min-width: 0;
   padding: 30px;
@@ -603,6 +622,120 @@ tbody tr:hover {
   background: #fee2e2;
 }
 
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(420px, 0.9fr) minmax(420px, 1fr);
+  background: #f7f8fb;
+}
+
+.auth-visual {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 42px;
+  color: #ffffff;
+  background:
+    linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(30, 64, 175, 0.84)),
+    url("./assets/hero.png") center bottom / 300px no-repeat;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+}
+
+.auth-copy {
+  max-width: 560px;
+}
+
+.auth-copy span,
+.auth-header span {
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.auth-header span {
+  color: #2563eb;
+}
+
+.auth-copy h1 {
+  margin: 12px 0;
+  color: #ffffff;
+  font-size: 42px;
+  line-height: 1.08;
+}
+
+.auth-copy p {
+  max-width: 480px;
+  color: #dbeafe;
+  font-size: 17px;
+}
+
+.auth-panel {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.auth-card {
+  width: min(100%, 460px);
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  padding: 28px;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgba(16, 24, 40, 0.08);
+}
+
+.auth-header h2 {
+  margin: 4px 0 0;
+  color: #101828;
+  font-size: 28px;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 22px 0 16px;
+  padding: 5px;
+  border-radius: 8px;
+  background: #eef2f6;
+}
+
+.auth-tabs button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 7px;
+  color: #475467;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.auth-tabs button.active {
+  color: #101828;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form .primary-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
 @media (max-width: 1080px) {
   .app-shell,
   .page-grid,
@@ -617,6 +750,12 @@ tbody tr:hover {
     border-bottom: 1px solid #e4e7ec;
   }
 
+  .logout-button {
+    position: static;
+    width: 100%;
+    margin-top: 18px;
+  }
+
   .nav-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -627,6 +766,21 @@ tbody tr:hover {
 
   .store-toolbar {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 920px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-visual,
+  .auth-panel {
+    min-height: auto;
+  }
+
+  .auth-visual {
+    gap: 48px;
   }
 }
 
@@ -651,5 +805,14 @@ tbody tr:hover {
     align-items: flex-start;
     flex-direction: column;
     min-height: 160px;
+  }
+
+  .auth-visual,
+  .auth-panel {
+    padding: 22px;
+  }
+
+  .auth-copy h1 {
+    font-size: 32px;
   }
 }

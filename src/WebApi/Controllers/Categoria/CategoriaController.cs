@@ -1,5 +1,6 @@
 ﻿using Application.Dtos;
 using Application.Dtos.Categoria;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
 
@@ -7,6 +8,7 @@ namespace WebApi.Controllers.Categoria
 {
     [ApiController]
     [Route("api/categoria")]
+    [Authorize]
     public class CategoriaController : Controller
     {
 

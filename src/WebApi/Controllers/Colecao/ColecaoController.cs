@@ -1,4 +1,5 @@
 ﻿using Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using WebApi.Service;
@@ -7,6 +8,7 @@ namespace WebApi.Controllers.Colecao
 {
     [ApiController]
     [Route("api/colecao")]
+    [Authorize]
     public class ColecaoController : Controller
     {
 

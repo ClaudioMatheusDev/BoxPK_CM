@@ -1,4 +1,4 @@
-export function Shell({ sections, activeSection, onSectionChange, children }) {
+export function Shell({ sections, activeSection, onSectionChange, onLogout, children }) {
   const groupedSections = sections.reduce((groups, section) => {
     const group = section.group ?? 'Geral'
     groups[group] = [...(groups[group] ?? []), section]
@@ -35,6 +35,10 @@ export function Shell({ sections, activeSection, onSectionChange, children }) {
             </div>
           ))}
         </nav>
+
+        <button type="button" className="logout-button" onClick={onLogout}>
+          Sair
+        </button>
       </aside>
 
       <main className="content">{children}</main>

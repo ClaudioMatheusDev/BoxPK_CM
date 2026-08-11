@@ -1,4 +1,5 @@
 ﻿using Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
 
@@ -6,6 +7,7 @@ namespace WebApi.Controllers.Fornecedor
 {
     [ApiController]
     [Route("api/fornecedor")]
+    [Authorize]
     public class FornecedorController : Controller
     {
 

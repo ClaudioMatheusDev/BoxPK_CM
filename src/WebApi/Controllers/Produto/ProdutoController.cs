@@ -1,5 +1,6 @@
 ﻿using Application.Dtos;
 using Application.Dtos.Produto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
 
@@ -7,6 +8,7 @@ namespace WebApi.Controllers.Produto
 {
     [ApiController]
     [Route("api/produto")]
+    [Authorize]
     public class ProdutoController : Controller
     {
 
