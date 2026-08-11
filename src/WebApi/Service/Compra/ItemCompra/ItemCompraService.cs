@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
 
 namespace WebApi.Service
@@ -17,13 +18,16 @@ namespace WebApi.Service
 
         public async Task<int> CriarItemCompra(ItemCompraCriarDto itemCompraCriarDto)
         {
+
+            var valorTotalCompra = itemCompraCriarDto.Quantidade * itemCompraCriarDto.ValorUnitario;
+
             var itemCompra = new ItemCompra
             {
                 IDCompra = itemCompraCriarDto.IDCompra,
                 IDProduto = itemCompraCriarDto.IDProduto,
                 Quantidade = itemCompraCriarDto.Quantidade,
                 ValorUnitario = itemCompraCriarDto.ValorUnitario,
-                ValorTotal = itemCompraCriarDto.ValorTotal
+                ValorTotal = valorTotalCompra
             };
 
             _context.ItensCompras.Add(itemCompra);
@@ -53,6 +57,7 @@ namespace WebApi.Service
         public async Task<int> AtualizarItemCompraEstoquePorID(int IDItemCompra, ItemCompraAtualizarDto itemCompraAtualizarDto)
         {
             var itemCompra = await _context.ItensCompras.FirstOrDefaultAsync(i => i.IDItemCompra == IDItemCompra);
+            var valorTotalCompra = itemCompraAtualizarDto.Quantidade * itemCompraAtualizarDto.ValorUnitario;
 
             if (itemCompra == null)
             {
@@ -63,7 +68,7 @@ namespace WebApi.Service
             itemCompra.IDProduto = itemCompraAtualizarDto.IDProduto;
             itemCompra.Quantidade = itemCompraAtualizarDto.Quantidade;
             itemCompra.ValorUnitario = itemCompraAtualizarDto.ValorUnitario;
-            itemCompra.ValorTotal = itemCompraAtualizarDto.ValorTotal;
+            itemCompra.ValorTotal = valorTotalCompra;
 
             await _context.SaveChangesAsync();
 

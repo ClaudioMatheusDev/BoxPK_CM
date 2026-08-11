@@ -1,0 +1,55 @@
+export const purchaseResources = {
+  compras: {
+    title: 'Compras',
+    endpoint: '/api/compra',
+    idKey: 'idCompra',
+    emptyLabel: 'compra',
+    lookupLabelKeys: ['idCompra', 'dataCompra', 'valorTotal'],
+    createDefaults: {
+      idFornecedor: '',
+      dataCompra: '',
+      valorTotal: '',
+      observacao: '',
+    },
+    updateStatusKey: 'statusCompra',
+    fields: [
+      { name: 'idFornecedor', label: 'Fornecedor', lookup: 'fornecedores', required: true },
+      { name: 'dataCompra', label: 'Data da compra', type: 'date', required: true },
+      { name: 'valorTotal', label: 'Valor total', type: 'number', step: '0.01', required: true },
+      { name: 'observacao', label: 'Observacao', type: 'textarea' },
+    ],
+    columns: [
+      { key: 'idCompra', label: 'ID' },
+      { key: 'idFornecedor', label: 'Fornecedor', lookup: 'fornecedores' },
+      { key: 'dataCompra', label: 'Data' },
+      { key: 'valorTotal', label: 'Total', format: 'currency' },
+      { key: 'statusCompra', label: 'Status', format: 'statusCompra' },
+    ],
+  },
+  itensCompra: {
+    title: 'Itens de compra',
+    endpoint: '/api/itemcompra',
+    idKey: 'idItemCompra',
+    emptyLabel: 'item de compra',
+    createDefaults: {
+      idCompra: '',
+      idProduto: '',
+      quantidade: '',
+      valorUnitario: '',
+    },
+    fields: [
+      { name: 'idCompra', label: 'Compra', lookup: 'compras', required: true },
+      { name: 'idProduto', label: 'Produto', lookup: 'produtos', required: true },
+      { name: 'quantidade', label: 'Quantidade', type: 'number', required: true },
+      { name: 'valorUnitario', label: 'Valor unitario', type: 'number', step: '0.01', required: true },
+    ],
+    columns: [
+      { key: 'idItemCompra', label: 'ID' },
+      { key: 'idCompra', label: 'Compra', lookup: 'compras' },
+      { key: 'idProduto', label: 'Produto', lookup: 'produtos' },
+      { key: 'quantidade', label: 'Qtd.' },
+      { key: 'valorUnitario', label: 'Unitario', format: 'currency' },
+      { key: 'valorTotal', label: 'Total', format: 'currency' },
+    ],
+  },
+}

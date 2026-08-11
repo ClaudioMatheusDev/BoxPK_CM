@@ -64,7 +64,7 @@ namespace WebApi.Service
             jogo.Nome = jogoAtualizarDto.Nome;
             jogo.Fabricante = jogoAtualizarDto.Fabricante;
             jogo.StatusJogo = jogoAtualizarDto.StatusJogo;
-            jogo.DataAtualizacao = DateTime.Now.AddHours(-3);
+            jogo.DataAtualizacao = DateTime.Now;
 
             await _context.SaveChangesAsync();
 

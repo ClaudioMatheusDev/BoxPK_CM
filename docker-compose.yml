@@ -1,0 +1,51 @@
+name: BoxPK_CM
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "${SA_PASSWORD}" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/WebApi/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      APPLY_MIGRATIONS: "true"
+      ConnectionStrings__DefaultConnection: Server=db,1433;Database=BoxPK_CM;User Id=sa;Password=${SA_PASSWORD};Encrypt=False;TrustServerCertificate=True
+    ports:
+      - "5236:5160"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./src/frontend/FrontEnd
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src/frontend/FrontEnd:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    depends_on:
+      - api
+
+
+volumes:
+  sqlserver-data:

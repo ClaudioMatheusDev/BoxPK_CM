@@ -83,6 +83,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("IDColecao");
 
+                    b.HasIndex("IDJogoTCG");
+
                     b.ToTable("Colecoes");
                 });
 
@@ -107,9 +109,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ValorTotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IDCompra");
+
+                    b.HasIndex("IDFornecedor");
 
                     b.ToTable("Compras");
                 });
@@ -141,6 +146,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("IDEstoque");
+
+                    b.HasIndex("IDProduto")
+                        .IsUnique();
 
                     b.ToTable("Estoques");
                 });
@@ -201,12 +209,18 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ValorTotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("ValorUnitario")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("IDItemCompra");
+
+                    b.HasIndex("IDCompra");
+
+                    b.HasIndex("IDProduto");
 
                     b.ToTable("ItensCompras");
                 });
@@ -274,6 +288,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("IDMovimentacao");
 
+                    b.HasIndex("IDProduto");
+
                     b.ToTable("MovimentacaoEstoques");
                 });
 
@@ -297,17 +313,26 @@ namespace Infrastructure.Migrations
                     b.Property<int>("IDCategoria")
                         .HasColumnType("int");
 
+                    b.Property<int?>("IDColecao")
+                        .HasColumnType("int");
+
                     b.Property<int>("IDJogoTCG")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImagemUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PrecoCusto")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PrecoVenda")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("StatusProduto")
@@ -315,7 +340,138 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("IDProduto");
 
+                    b.HasIndex("IDCategoria");
+
+                    b.HasIndex("IDColecao");
+
+                    b.HasIndex("IDJogoTCG");
+
                     b.ToTable("Produtos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Colecao", b =>
+                {
+                    b.HasOne("Domain.Entities.Jogo", "JogoTCG")
+                        .WithMany("Colecoes")
+                        .HasForeignKey("IDJogoTCG")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("JogoTCG");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Compra", b =>
+                {
+                    b.HasOne("Domain.Entities.Fornecedor", "Fornecedor")
+                        .WithMany("Compras")
+                        .HasForeignKey("IDFornecedor")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Fornecedor");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Estoque", b =>
+                {
+                    b.HasOne("Domain.Entities.Produto", "Produto")
+                        .WithOne("Estoque")
+                        .HasForeignKey("Domain.Entities.Estoque", "IDProduto")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Produto");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ItemCompra", b =>
+                {
+                    b.HasOne("Domain.Entities.Compra", "Compra")
+                        .WithMany("Itens")
+                        .HasForeignKey("IDCompra")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Produto", "Produto")
+                        .WithMany("ItensCompra")
+                        .HasForeignKey("IDProduto")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Compra");
+
+                    b.Navigation("Produto");
+                });
+
+            modelBuilder.Entity("Domain.Entities.MovimentacaoEstoque", b =>
+                {
+                    b.HasOne("Domain.Entities.Produto", "Produto")
+                        .WithMany("MovimentacoesEstoque")
+                        .HasForeignKey("IDProduto")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Produto");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Produto", b =>
+                {
+                    b.HasOne("Domain.Entities.Categoria", "Categoria")
+                        .WithMany("Produtos")
+                        .HasForeignKey("IDCategoria")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Colecao", "Colecao")
+                        .WithMany("Produtos")
+                        .HasForeignKey("IDColecao")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.Jogo", "JogoTCG")
+                        .WithMany("Produtos")
+                        .HasForeignKey("IDJogoTCG")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Categoria");
+
+                    b.Navigation("Colecao");
+
+                    b.Navigation("JogoTCG");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Categoria", b =>
+                {
+                    b.Navigation("Produtos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Colecao", b =>
+                {
+                    b.Navigation("Produtos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Compra", b =>
+                {
+                    b.Navigation("Itens");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Fornecedor", b =>
+                {
+                    b.Navigation("Compras");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Jogo", b =>
+                {
+                    b.Navigation("Colecoes");
+
+                    b.Navigation("Produtos");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Produto", b =>
+                {
+                    b.Navigation("Estoque");
+
+                    b.Navigation("ItensCompra");
+
+                    b.Navigation("MovimentacoesEstoque");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,10 +3,8 @@ using Application.Dtos.Produto;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using System.Runtime.CompilerServices;
+
 
 namespace WebApi.Service
 {
@@ -30,7 +28,9 @@ namespace WebApi.Service
                 PrecoVenda = produtoCriarDto.PrecoVenda,
                 IDCategoria = produtoCriarDto.IDCategoria,
                 IDJogoTCG = produtoCriarDto.IDJogoTCG,
-                StatusProduto = StatusProduto.Ativo
+                IDColecao = produtoCriarDto.IDColecao,
+                StatusProduto = StatusProduto.Ativo,
+                ImagemUrl = produtoCriarDto.ImagemUrl
             };
 
             _context.Produtos.Add(produto);
@@ -73,7 +73,9 @@ namespace WebApi.Service
             produto.PrecoVenda = produtoAtualizarDto.PrecoVenda;
             produto.IDCategoria = produtoAtualizarDto.IDCategoria;
             produto.IDJogoTCG = produtoAtualizarDto.IDJogoTCG;
+            produto.IDColecao = produtoAtualizarDto.IDColecao;
             produto.StatusProduto = produtoAtualizarDto.StatusProduto;
+            produto.ImagemUrl = produtoAtualizarDto.ImagemUrl;
             produto.DataAlteracao = DateTime.Now;
 
             await _context.SaveChangesAsync();

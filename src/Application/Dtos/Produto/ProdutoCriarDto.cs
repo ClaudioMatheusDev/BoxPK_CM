@@ -1,6 +1,4 @@
-﻿using Domain.Enums;
-
-namespace Application.Dtos
+﻿namespace Application.Dtos
 {
     public class ProdutoCriarDto
     {
@@ -10,5 +8,7 @@ namespace Application.Dtos
         public decimal PrecoVenda { get; set; }
         public int IDCategoria { get; set; }
         public int IDJogoTCG { get; set; }
+        public int? IDColecao { get; set; }
+        public string? ImagemUrl { get; set; }
     }
 }
