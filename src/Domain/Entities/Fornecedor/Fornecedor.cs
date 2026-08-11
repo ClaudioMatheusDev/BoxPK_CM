@@ -12,7 +12,8 @@ namespace Domain.Entities
         public required string Email { get; set; }
         public required string Telefone { get; set; }
         public StatusFornecedor StatusFornecedor { get; set; }
-        public DateTime DataCadastro { get; set; } = DateTime.Now.AddHours(-3);
+        public DateTime DataCadastro { get; set; } = DateTime.Now;
         public DateTime DataAtualizacao { get; set; }
+        public ICollection<Compra> Compras { get; set; } = new List<Compra>();
     }
 }

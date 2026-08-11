@@ -10,6 +10,7 @@ namespace Application.Dtos.Produto
         public decimal PrecoVenda { get; set; }
         public int IDCategoria { get; set; }
         public int IDJogoTCG { get; set; }
+        public int? IDColecao { get; set; }
         public StatusProduto StatusProduto { get; set; }
     }
 }

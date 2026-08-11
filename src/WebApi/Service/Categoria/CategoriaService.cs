@@ -71,7 +71,7 @@ namespace WebApi.Service
             categoria.Nome = categoriaAtualizarDto.Nome;
             categoria.Descricao = categoriaAtualizarDto.Descricao;
             categoria.StatusCategoria = categoriaAtualizarDto.StatusCategoria;
-            categoria.DataAlteracao = DateTime.Now.AddHours(-3);
+            categoria.DataAlteracao = DateTime.Now;
 
             await _context.SaveChangesAsync();
 

@@ -12,5 +12,7 @@ namespace Domain.Entities
         public decimal ValorTotal { get; set; }
         public string? Observacao { get; set; }
         public StatusCompra StatusCompra { get; set; }
+        public Fornecedor Fornecedor { get; set; } = null!;
+        public ICollection<ItemCompra> Itens { get; set; } = new List<ItemCompra>();
     }
 }

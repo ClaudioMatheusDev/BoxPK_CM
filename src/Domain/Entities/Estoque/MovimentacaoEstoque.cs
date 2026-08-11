@@ -15,5 +15,6 @@ namespace Domain.Entities
         public string? Motivo { get; set; }
         public string? Observacao { get; set; }
         public DateTime DataMovimentacao { get; set; } = DateTime.Now;
+        public Produto Produto { get; set; } = null!;
     }
 }

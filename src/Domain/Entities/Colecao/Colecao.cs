@@ -14,5 +14,7 @@ namespace Domain.Entities
         public StatusColecao StatusColecao { get; set; }
         public DateTime DataInclusao { get; set; } = DateTime.Now;
         public DateTime DataAlteracao { get; set; }
+        public Jogo JogoTCG { get; set; } = null!;
+        public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
     }
 }

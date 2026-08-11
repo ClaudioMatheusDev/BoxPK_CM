@@ -12,5 +12,7 @@ namespace Domain.Entities
         public int Quantidade { get; set; }
         public decimal ValorUnitario { get; set; }
         public decimal ValorTotal { get; set; }
+        public Compra Compra { get; set; } = null!;
+        public Produto Produto { get; set; } = null!;
     }
 }

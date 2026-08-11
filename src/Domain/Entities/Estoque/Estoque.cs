@@ -12,5 +12,6 @@ namespace Domain.Entities
         public int QuantidadeMaxima { get; set; }
         public DateTime DataInclusao { get; set; } = DateTime.Now;
         public DateTime DataAtualizacao { get; set; }
+        public Produto Produto { get; set; } = null!;
     }
 }

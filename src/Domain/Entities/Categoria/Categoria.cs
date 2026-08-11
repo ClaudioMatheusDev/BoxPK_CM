@@ -10,7 +10,8 @@ namespace Domain.Entities
         public required string Nome { get; set; }
         public string? Descricao { get; set; }
         public StatusCategoria StatusCategoria { get; set; }
-        public DateTime DataInclusao {get; set;} = DateTime.Now.AddHours(-3);
+        public DateTime DataInclusao {get; set;} = DateTime.Now;
         public DateTime DataAlteracao {get; set;}
+        public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
     }
 }

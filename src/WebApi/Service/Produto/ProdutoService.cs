@@ -30,6 +30,7 @@ namespace WebApi.Service
                 PrecoVenda = produtoCriarDto.PrecoVenda,
                 IDCategoria = produtoCriarDto.IDCategoria,
                 IDJogoTCG = produtoCriarDto.IDJogoTCG,
+                IDColecao = produtoCriarDto.IDColecao,
                 StatusProduto = StatusProduto.Ativo
             };
 
@@ -73,6 +74,7 @@ namespace WebApi.Service
             produto.PrecoVenda = produtoAtualizarDto.PrecoVenda;
             produto.IDCategoria = produtoAtualizarDto.IDCategoria;
             produto.IDJogoTCG = produtoAtualizarDto.IDJogoTCG;
+            produto.IDColecao = produtoAtualizarDto.IDColecao;
             produto.StatusProduto = produtoAtualizarDto.StatusProduto;
             produto.DataAlteracao = DateTime.Now;
 

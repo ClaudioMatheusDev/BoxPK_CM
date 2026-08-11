@@ -73,7 +73,7 @@ namespace WebApi.Service
             fornecedor.Email = fornecedorAtualizarDto.Email;
             fornecedor.Telefone = fornecedorAtualizarDto.Telefone;
             fornecedor.StatusFornecedor = fornecedorAtualizarDto.StatusFornecedor;
-            fornecedor.DataAtualizacao = DateTime.Now.AddHours(-3);
+            fornecedor.DataAtualizacao = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
