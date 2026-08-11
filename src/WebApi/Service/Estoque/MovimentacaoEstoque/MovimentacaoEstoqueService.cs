@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebApi.Service
@@ -16,20 +15,54 @@ namespace WebApi.Service
             _context = context;
         }
 
-        public async Task<int> CriarMovimentacaoEstoque(MovimentacaoEstoqueCriarDto movimentacaoEstoqueCriarDto)
+        public async Task<int> CriarMovimentacaoEstoque(
+     MovimentacaoEstoqueCriarDto movimentacaoEstoqueCriarDto)
         {
+            var estoque = await _context.Estoques.FirstOrDefaultAsync(e => e.IDProduto == movimentacaoEstoqueCriarDto.IDProduto);
+
+            if (estoque is null)
+            {
+                throw new Exception("Estoque não encontrado.");
+            }
+
+            if (movimentacaoEstoqueCriarDto.Quantidade <= 0)
+            {
+                throw new Exception("A quantidade da movimentação deve ser maior que zero.");
+            }
+
+            var quantidadeAnterior = estoque.QuantidadeAtual;
+            var quantidadePosterior = quantidadeAnterior;
+
+            if (movimentacaoEstoqueCriarDto.TipoMovimentacao == TipoMovimentacao.Entrada)
+            {
+                quantidadePosterior = quantidadeAnterior + movimentacaoEstoqueCriarDto.Quantidade;
+            }
+
+            if (movimentacaoEstoqueCriarDto.TipoMovimentacao == TipoMovimentacao.Saida)
+            {
+                if (movimentacaoEstoqueCriarDto.Quantidade > quantidadeAnterior)
+                {
+                    throw new Exception( "Não é possível realizar uma saída maior que o saldo atual.");
+                }
+
+                quantidadePosterior = quantidadeAnterior - movimentacaoEstoqueCriarDto.Quantidade;
+            }
+
+            estoque.QuantidadeAtual = quantidadePosterior;
+
             var movimentacao = new MovimentacaoEstoque
             {
                 IDProduto = movimentacaoEstoqueCriarDto.IDProduto,
                 TipoMovimentacao = movimentacaoEstoqueCriarDto.TipoMovimentacao,
-                QuantidadeAnterior = movimentacaoEstoqueCriarDto.QuantidadeAnterior,
+                QuantidadeAnterior = quantidadeAnterior,
                 Quantidade = movimentacaoEstoqueCriarDto.Quantidade,
-                QuantidadePosterior = movimentacaoEstoqueCriarDto.QuantidadePosterior,
+                QuantidadePosterior = quantidadePosterior,
                 Motivo = movimentacaoEstoqueCriarDto.Motivo,
                 Observacao = movimentacaoEstoqueCriarDto.Observacao
             };
 
             _context.MovimentacaoEstoques.Add(movimentacao);
+
             await _context.SaveChangesAsync();
 
             return movimentacao.IDMovimentacao;
@@ -63,11 +96,6 @@ namespace WebApi.Service
                 throw new Exception("Movimentação não encontrada");
             }
 
-            movimentacao.IDProduto = movimentacaoEstoqueAtualizarDto.IDProduto;
-            movimentacao.TipoMovimentacao = movimentacaoEstoqueAtualizarDto.TipoMovimentacao;
-            movimentacao.QuantidadeAnterior = movimentacaoEstoqueAtualizarDto.QuantidadeAnterior;
-            movimentacao.Quantidade = movimentacaoEstoqueAtualizarDto.Quantidade;
-            movimentacao.QuantidadePosterior = movimentacaoEstoqueAtualizarDto.QuantidadePosterior;
             movimentacao.Motivo = movimentacaoEstoqueAtualizarDto.Motivo;
             movimentacao.Observacao = movimentacaoEstoqueAtualizarDto.Observacao;
 
