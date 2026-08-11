@@ -4,11 +4,13 @@ import { resourceDefinitions } from './core/resources'
 import { Dashboard } from './features/dashboard/Dashboard'
 import { inventoryResources } from './features/inventory/inventoryResources'
 import { purchaseResources } from './features/purchases/purchaseResources'
+import { StorefrontPage } from './features/storefront/StorefrontPage'
 import { ResourcePage } from './shared/components/ResourcePage'
 import { Shell } from './shared/components/Shell'
 
 const sections = [
   { id: 'dashboard', label: 'Dashboard', icon: 'D', group: 'Principal' },
+  { id: 'vitrine', label: 'Vitrine', icon: 'V', group: 'Principal' },
   { id: 'produtos', label: 'Produtos', icon: 'P', group: 'Catalogo', definition: resourceDefinitions.produtos },
   { id: 'categorias', label: 'Categorias', icon: 'C', group: 'Catalogo', definition: resourceDefinitions.categorias },
   { id: 'jogos', label: 'Jogos', icon: 'J', group: 'Catalogo', definition: resourceDefinitions.jogos },
@@ -37,6 +39,8 @@ function App() {
     <Shell sections={sections} activeSection={activeSection} onSectionChange={setActiveSection}>
       {activeSection === 'dashboard' ? (
         <Dashboard />
+      ) : activeSection === 'vitrine' ? (
+        <StorefrontPage />
       ) : (
         <ResourcePage definition={currentSection.definition} resourcesByKey={resourcesByKey} />
       )}

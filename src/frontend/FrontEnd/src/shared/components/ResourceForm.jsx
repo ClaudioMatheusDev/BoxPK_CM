@@ -134,6 +134,8 @@ export function ResourceForm({
                 name={field.name}
                 type={field.type ?? 'text'}
                 step={field.step}
+                maxLength={field.maxLength}
+                placeholder={field.placeholder}
                 value={values[field.name] ?? ''}
                 onChange={handleChange}
                 required={field.required}
@@ -142,6 +144,7 @@ export function ResourceForm({
             {hasNoLookupOptions ? (
               <small className="field-help">Nenhum registro disponivel para selecionar.</small>
             ) : null}
+            {field.help ? <small className="field-help neutral">{field.help}</small> : null}
           </label>
           )
         })}

@@ -23,8 +23,8 @@ namespace Domain.Entities
         public Estoque? Estoque { get; set; }
         public ICollection<MovimentacaoEstoque> MovimentacoesEstoque { get; set; } = new List<MovimentacaoEstoque>();
         public ICollection<ItemCompra> ItensCompra { get; set; } = new List<ItemCompra>();
-        [StringLength(255)]
+        [StringLength(2048)]
         [Display(Name = "Imagem do Produto")]
-        public string ImagemUrl { get; set; }
+        public string? ImagemUrl { get; set; }
     }
 }

@@ -130,6 +130,7 @@ export const resourceDefinitions = {
       idCategoria: '',
       idJogoTCG: '',
       idColecao: '',
+      imagemUrl: '',
     },
     updateStatusKey: 'statusProduto',
     fields: [
@@ -140,6 +141,14 @@ export const resourceDefinitions = {
       { name: 'idCategoria', label: 'Categoria', lookup: 'categorias', required: true },
       { name: 'idJogoTCG', label: 'Jogo', lookup: 'jogos', required: true },
       { name: 'idColecao', label: 'Colecao', lookup: 'colecoes' },
+      {
+        name: 'imagemUrl',
+        label: 'URL da imagem',
+        type: 'url',
+        maxLength: 2048,
+        placeholder: 'https://exemplo.com/imagem.jpg',
+        help: 'Use um link publico da imagem. Evite colar base64/data:image.',
+      },
     ],
     columns: [
       { key: 'idProduto', label: 'ID' },
@@ -148,6 +157,7 @@ export const resourceDefinitions = {
       { key: 'precoVenda', label: 'Venda', format: 'currency' },
       { key: 'idCategoria', label: 'Categoria', lookup: 'categorias' },
       { key: 'idJogoTCG', label: 'Jogo', lookup: 'jogos' },
+      { key: 'imagemUrl', label: 'Imagem', format: 'image' },
       { key: 'statusProduto', label: 'Status', format: 'statusProduto' },
     ],
   },

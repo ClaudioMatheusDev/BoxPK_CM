@@ -13,10 +13,9 @@ namespace Infrastructure.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "ImagemUrl",
                 table: "Produtos",
-                type: "nvarchar(255)",
-                maxLength: 255,
-                nullable: false,
-                defaultValue: "");
+                type: "nvarchar(2048)",
+                maxLength: 2048,
+                nullable: true);
         }
 
         /// <inheritdoc />

@@ -34,6 +34,10 @@ export const formatCellValue = (column, row, lookups = {}) => {
     return formatDate(value)
   }
 
+  if (column.format === 'image') {
+    return value ? 'Com imagem' : 'Sem imagem'
+  }
+
   if (column.format) {
     return formatStatus(column.format, value)
   }

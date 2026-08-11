@@ -12,5 +12,6 @@ namespace Application.Dtos.Produto
         public int IDJogoTCG { get; set; }
         public int? IDColecao { get; set; }
         public StatusProduto StatusProduto { get; set; }
+        public string? ImagemUrl { get; set; }
     }
 }
