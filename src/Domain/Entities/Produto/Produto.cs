@@ -14,7 +14,7 @@ namespace Domain.Entities
         public int IDCategoria { get; set; }
         public int IDJogoTCG { get; set; }
         public StatusProduto StatusProduto { get; set; }
-        public DateTime DataCriacao { get; set; } = DateTime.Now.AddHours(-3);
+        public DateTime DataCriacao { get; set; } = DateTime.Now;
         public DateTime DataAlteracao { get; set; }
           }
 }

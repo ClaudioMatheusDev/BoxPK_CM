@@ -26,6 +26,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IFornecedorService, FornecedorService>();
 builder.Services.AddScoped<IJogoService, JogoService>();
+builder.Services.AddScoped<IProdutoService, ProdutoService>();
+builder.Services.AddScoped<IColecaoService, ColecaoService>();
+builder.Services.AddScoped<IEstoqueService, EstoqueService>();
+builder.Services.AddScoped<IMovimentacaoEstoque, MovimentacaoEstoqueService>();
+builder.Services.AddScoped<ICompraService, CompraService>();
+builder.Services.AddScoped<IItemCompraService, ItemCompraService>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
