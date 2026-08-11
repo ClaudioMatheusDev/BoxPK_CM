@@ -1,0 +1,65 @@
+export const inventoryResources = {
+  estoque: {
+    title: 'Estoque',
+    endpoint: '/api/estoque',
+    idKey: 'idEstoque',
+    emptyLabel: 'item de estoque',
+    createDefaults: {
+      idProduto: '',
+      quantidadeAtual: '',
+      quantidadeMinima: '',
+      quantidadeMaxima: '',
+    },
+    fields: [
+      { name: 'idProduto', label: 'Produto', lookup: 'produtos', required: true },
+      { name: 'quantidadeAtual', label: 'Atual', type: 'number', required: true },
+      { name: 'quantidadeMinima', label: 'Minima', type: 'number', required: true },
+      { name: 'quantidadeMaxima', label: 'Maxima', type: 'number', required: true },
+    ],
+    columns: [
+      { key: 'idEstoque', label: 'ID' },
+      { key: 'idProduto', label: 'Produto', lookup: 'produtos' },
+      { key: 'quantidadeAtual', label: 'Atual' },
+      { key: 'quantidadeMinima', label: 'Minima' },
+      { key: 'quantidadeMaxima', label: 'Maxima' },
+    ],
+  },
+  movimentacoes: {
+    title: 'Movimentacoes',
+    endpoint: '/api/movimentacoestoque',
+    idKey: 'idMovimentacao',
+    emptyLabel: 'movimentacao',
+    createDefaults: {
+      idProduto: '',
+      tipoMovimentacao: 1,
+      quantidade: '',
+      motivo: '',
+      observacao: '',
+    },
+    fields: [
+      { name: 'idProduto', label: 'Produto', lookup: 'produtos', required: true },
+      {
+        name: 'tipoMovimentacao',
+        label: 'Tipo',
+        type: 'select',
+        options: [
+          { value: 1, label: 'Entrada' },
+          { value: 2, label: 'Saida' },
+        ],
+        required: true,
+      },
+      { name: 'quantidade', label: 'Quantidade', type: 'number', required: true },
+      { name: 'motivo', label: 'Motivo' },
+      { name: 'observacao', label: 'Observacao', type: 'textarea' },
+    ],
+    columns: [
+      { key: 'idMovimentacao', label: 'ID' },
+      { key: 'idProduto', label: 'Produto', lookup: 'produtos' },
+      { key: 'tipoMovimentacao', label: 'Tipo', format: 'tipoMovimentacao' },
+      { key: 'quantidadeAnterior', label: 'Anterior' },
+      { key: 'quantidade', label: 'Qtd.' },
+      { key: 'quantidadePosterior', label: 'Posterior' },
+      { key: 'dataMovimentacao', label: 'Data', format: 'date' },
+    ],
+  },
+}
