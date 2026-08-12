@@ -1,16 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Data;
-using WebApi.Service;
-using WebApi.Service.Auth;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Application.Dtos;
 using Application.Users;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebApi.Service;
+using WebApi.Service.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 

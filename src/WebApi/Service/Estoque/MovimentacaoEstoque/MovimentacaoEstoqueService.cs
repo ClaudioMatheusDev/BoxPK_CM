@@ -124,10 +124,19 @@ namespace WebApi.Service
 
             var quantidadeAnterior = estoque.QuantidadeAtual;
 
-            var quantidadeAjustada = quantidadeAnterior + movimentacao.Quantidade;
+            var quantidadeAjustadaSaida = quantidadeAnterior + movimentacao.Quantidade;
+            var quantidadeAjustadaEntrada = quantidadeAnterior - movimentacao.Quantidade;
 
-            estoque.QuantidadeAtual = quantidadeAjustada;
+            if (movimentacao.TipoMovimentacao == TipoMovimentacao.Saida)
+            {
 
+                estoque.QuantidadeAtual = quantidadeAjustadaSaida;
+            }
+
+            if (movimentacao.TipoMovimentacao == TipoMovimentacao.Entrada)
+            {
+                estoque.QuantidadeAtual = quantidadeAjustadaEntrada;
+            }
 
             _context.MovimentacaoEstoques.Remove(movimentacao);
             await _context.SaveChangesAsync();
