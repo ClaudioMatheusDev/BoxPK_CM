@@ -68,6 +68,7 @@ cd BoxPK_CM
 
 ```env
 SA_PASSWORD=SuaSenhaForte123!
+Jwt__Key=SuaChaveJwtComPeloMenos32Caracteres
 VITE_API_BASE_URL=http://localhost:5236
 ```
 
@@ -103,6 +104,7 @@ Lembre-se de ajustar a connection string no arquivo de configuração da API con
 ## Variáveis de ambiente
 
 - `SA_PASSWORD`: senha do SQL Server utilizado pelo Docker Compose
+- `Jwt__Key`: chave usada para assinar e validar os tokens JWT da API
 - `VITE_API_BASE_URL`: URL base da API consumida pelo frontend
 
 ## Funcionalidades principais

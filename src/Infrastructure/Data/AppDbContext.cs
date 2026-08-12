@@ -1,9 +1,12 @@
-﻿using Domain.Entities;
+﻿using Application.Users;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -18,6 +21,7 @@ namespace Infrastructure.Data
         public DbSet<Fornecedor> Fornecedores { get; set; }
         public DbSet<Jogo> Jogos { get; set; }
         public DbSet<Produto> Produtos { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

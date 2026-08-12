@@ -1,4 +1,5 @@
 ﻿using Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -7,6 +8,7 @@ namespace WebApi.Controllers.Estoque
 {
     [ApiController]
     [Route("api/estoque")]
+    [Authorize]
     public class EstoqueController : Controller
     {
         private readonly IEstoqueService _estoqueService;

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import './App.css'
 import { resourceDefinitions } from './core/resources'
+import { AuthPage } from './features/auth/AuthPage'
+import { useAuth } from './features/auth/useAuth'
 import { Dashboard } from './features/dashboard/Dashboard'
 import { inventoryResources } from './features/inventory/inventoryResources'
 import { purchaseResources } from './features/purchases/purchaseResources'
@@ -29,14 +31,24 @@ const resourcesByKey = {
 }
 
 function App() {
+  const { isAuthenticated, logout } = useAuth()
   const [activeSection, setActiveSection] = useState('dashboard')
   const currentSection = useMemo(
     () => sections.find((section) => section.id === activeSection),
     [activeSection],
   )
 
+  if (!isAuthenticated) {
+    return <AuthPage />
+  }
+
   return (
-    <Shell sections={sections} activeSection={activeSection} onSectionChange={setActiveSection}>
+    <Shell
+      sections={sections}
+      activeSection={activeSection}
+      onLogout={logout}
+      onSectionChange={setActiveSection}
+    >
       {activeSection === 'dashboard' ? (
         <Dashboard />
       ) : activeSection === 'vitrine' ? (
