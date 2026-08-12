@@ -5,6 +5,8 @@ export function Shell({ sections, activeSection, onSectionChange, onLogout, chil
     return groups
   }, {})
 
+  const currentLabel = sections.find((section) => section.id === activeSection)?.label ?? 'Dashboard'
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -41,7 +43,21 @@ export function Shell({ sections, activeSection, onSectionChange, onLogout, chil
         </button>
       </aside>
 
-      <main className="content">{children}</main>
+      <main className="content">
+        <div className="content-shell">
+          <header className="content-header">
+            <div>
+              <span>Operações</span>
+              <h2>{currentLabel}</h2>
+            </div>
+            <div className="header-badges">
+              <span className="status-pill success">Sistema ativo</span>
+              <span className="status-pill">Cloud sync</span>
+            </div>
+          </header>
+          {children}
+        </div>
+      </main>
     </div>
   )
 }
