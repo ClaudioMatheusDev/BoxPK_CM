@@ -42,7 +42,7 @@ namespace WebApi.Service
             {
                 if (movimentacaoEstoqueCriarDto.Quantidade > quantidadeAnterior)
                 {
-                    throw new Exception( "Não é possível realizar uma saída maior que o saldo atual.");
+                    throw new Exception("Não é possível realizar uma saída maior que o saldo atual.");
                 }
 
                 quantidadePosterior = quantidadeAnterior - movimentacaoEstoqueCriarDto.Quantidade;
@@ -113,6 +113,21 @@ namespace WebApi.Service
             {
                 throw new Exception("Movimentação não encontrada");
             }
+
+            var estoque = await _context.Estoques.FirstOrDefaultAsync(e => e.IDProduto == movimentacao.IDProduto);
+
+            if (estoque is null)
+            {
+                throw new Exception("Movimentação não encontrada");
+            }
+
+
+            var quantidadeAnterior = estoque.QuantidadeAtual;
+
+            var quantidadeAjustada = quantidadeAnterior + movimentacao.Quantidade;
+
+            estoque.QuantidadeAtual = quantidadeAjustada;
+
 
             _context.MovimentacaoEstoques.Remove(movimentacao);
             await _context.SaveChangesAsync();

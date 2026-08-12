@@ -18,8 +18,13 @@ namespace WebApi.Service
 
         public async Task<int> CriarItemCompra(ItemCompraCriarDto itemCompraCriarDto)
         {
-
+            var compra = await _context.Compras.FirstOrDefaultAsync(c => c.IDCompra == itemCompraCriarDto.IDCompra);
             var valorTotalCompra = itemCompraCriarDto.Quantidade * itemCompraCriarDto.ValorUnitario;
+
+            if (compra == null)
+            {
+                throw new Exception("Nenhuma compra cadastrado");
+            }
 
             var itemCompra = new ItemCompra
             {
@@ -29,6 +34,8 @@ namespace WebApi.Service
                 ValorUnitario = itemCompraCriarDto.ValorUnitario,
                 ValorTotal = valorTotalCompra
             };
+
+            compra.ValorTotal = valorTotalCompra;
 
             _context.ItensCompras.Add(itemCompra);
             await _context.SaveChangesAsync();
