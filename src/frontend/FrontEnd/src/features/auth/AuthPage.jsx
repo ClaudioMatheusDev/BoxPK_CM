@@ -60,7 +60,7 @@ export function AuthPage() {
     <main className="auth-page">
       <section className="auth-visual">
         <div className="auth-brand">
-          <span className="brand-mark">B</span>
+          <span className="brand-mark">.   Box</span>
           <strong>BoxPK CM</strong>
         </div>
 

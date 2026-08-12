@@ -11,10 +11,10 @@ export function Shell({ sections, activeSection, onSectionChange, onLogout, chil
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">B</span>
+          <span className="brand-mark">.   Box</span>
           <div>
             <strong>BoxPK CM</strong>
-            <span>Controle de cartas</span>
+            <span>Controle de cartas TCG</span>
           </div>
         </div>
 

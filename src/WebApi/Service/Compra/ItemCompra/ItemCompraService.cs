@@ -17,9 +17,11 @@ namespace WebApi.Service
             var compra = await _context.Compras.FirstOrDefaultAsync(c => c.IDCompra == idCompra);
             if (compra == null) return;
 
-            var totalItens = await _context.ItensCompras
+            var itens = await _context.ItensCompras
                 .Where(i => i.IDCompra == idCompra)
-                .SumAsync(i => i.ValorTotal);
+                .ToListAsync();
+
+            var totalItens = itens.Sum(i => i.ValorTotal);
 
             compra.ValorTotal = totalItens;
         }
