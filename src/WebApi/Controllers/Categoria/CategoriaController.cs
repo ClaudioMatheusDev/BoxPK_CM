@@ -24,6 +24,7 @@ namespace WebApi.Controllers.Categoria
         {
             var categoria = await _categoriaService.CriarCategoria(categoriaCriarDto);
 
+
             return Ok();
         }
 
@@ -32,6 +33,11 @@ namespace WebApi.Controllers.Categoria
         {
             var categoria = await _categoriaService.ListarCategorias();
 
+            if (categoria is null)
+            {
+                return NotFound();
+            }
+
             return Ok(categoria);
         }
 
@@ -39,6 +45,11 @@ namespace WebApi.Controllers.Categoria
         public async Task<IActionResult> BuscarCategoriasPorID(int IDCategoria)
         {
             var categoria = await _categoriaService.ListarCategoriaPorID(IDCategoria);
+
+            if (categoria is null)
+            {
+                return NotFound();
+            }
 
             return Ok(categoria);
         }

@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebApi.Service

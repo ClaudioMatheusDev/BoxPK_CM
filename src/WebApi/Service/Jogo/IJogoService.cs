@@ -1,7 +1,6 @@
 ﻿using Application.Dtos;
 using Application.Dtos.Jogo;
 using Domain.Entities;
-using System.Runtime.CompilerServices;
 
 namespace WebApi.Service
 {

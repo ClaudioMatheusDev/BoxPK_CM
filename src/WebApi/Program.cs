@@ -1,16 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Data;
-using WebApi.Service;
-using WebApi.Service.Auth;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Application.Dtos;
 using Application.Users;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebApi.Service;
+using WebApi.Service.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +36,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-var jwtKey = builder.Configuration["Jwt:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY");
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? builder.Configuration["JWT_KEY"]
+    ?? Environment.GetEnvironmentVariable("Jwt__Key")
+    ?? Environment.GetEnvironmentVariable("JWT_KEY");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "BoxPK_CM";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "BoxPK_CMClients";
 
@@ -98,7 +100,7 @@ if (app.Environment.IsDevelopment())
 {
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.Run();
 
