@@ -65,11 +65,10 @@ export function AuthPage() {
         </div>
 
         <div className="auth-copy">
-          <span>Gestao protegida</span>
+          <span>Gestao protegida - BoxPK CM</span>
           <h1>Controle seu catalogo, estoque e compras com seguranca.</h1>
           <p>
-            Acesse o painel com JWT, refresh token em cookie seguro e rotas protegidas
-            pela API.
+            Conecte-se à sua conta para ter acesso a todas as funcionalidades do BoxPK CM. Caso não tenha uma conta, registre-se para começar a utilizar o sistema.
           </p>
         </div>
       </section>
