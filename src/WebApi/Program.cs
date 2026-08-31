@@ -1,5 +1,7 @@
 using Application.Dtos;
 using Application.Users;
+using AuditLogCM.EFCore.Extensions;
+using AuditLogCM.EFCore.Persistence;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Data;
@@ -9,14 +11,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApi.Service;
+using WebApi.Service.Auditoria;
 using WebApi.Service.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddHttpContextAccessor();
+
+// Registra o serviço de auditoria e o banco onde os logs ficam
+builder.Services.AddAuditLog<CurrentUserResolver>(options =>
+    options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Infrastructure")));
+// Associa o interceptor ao DbContext da sua aplicação
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+    options.UseSqlServer(connectionString).UseAuditLog(sp));
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<ItemCompraAtualizarDtoValidator>();
@@ -80,6 +89,8 @@ builder.Services.AddScoped<IMovimentacaoEstoque, MovimentacaoEstoqueService>();
 builder.Services.AddScoped<ICompraService, CompraService>();
 builder.Services.AddScoped<IItemCompraService, ItemCompraService>();
 
+
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -89,6 +100,9 @@ if (app.Configuration.GetValue<bool>("APPLY_MIGRATIONS"))
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
+
+    var auditDbContext = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
+    await auditDbContext.Database.MigrateAsync();
 }
 
 app.UseCors("PermitirReact");
