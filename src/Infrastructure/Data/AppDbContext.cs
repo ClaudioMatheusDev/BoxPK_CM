@@ -10,6 +10,7 @@ namespace Infrastructure.Data
     public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         private static readonly string TenantProperty = "TenantId";
+        private static readonly HashSet<Type> TenantEntityTypes = new();
         private readonly ITenantProvider _tenantProvider;
 
         public AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvider tenantProvider) : base(options)
@@ -127,6 +128,7 @@ namespace Infrastructure.Data
         /// </summary>
         private void ConfigurarTenant<TEntity>(ModelBuilder modelBuilder) where TEntity : class
         {
+            TenantEntityTypes.Add(typeof(TEntity));
             modelBuilder.Entity<TEntity>().Property<Guid>(TenantProperty);
             modelBuilder.Entity<TEntity>().HasIndex(TenantProperty);
             modelBuilder.Entity<TEntity>().HasQueryFilter(e => EF.Property<Guid>(e, TenantProperty) == CurrentTenantId);
@@ -136,8 +138,8 @@ namespace Infrastructure.Data
         {
             foreach (var entry in ChangeTracker.Entries().Where(e => e.State == EntityState.Added))
             {
-                var property = entry.Metadata.FindProperty(TenantProperty);
-                if (property is null) continue;
+                // Só entidades de negócio: ApplicationUser (Identity) possui a própria propriedade TenantId.
+                if (!TenantEntityTypes.Contains(entry.Entity.GetType())) continue;
 
                 if (CurrentTenantId == Guid.Empty)
                     throw new InvalidOperationException("Operação exige um usuário autenticado com TenantId.");

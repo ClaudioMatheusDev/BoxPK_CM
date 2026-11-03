@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Alert } from '../../shared/components/Alert'
+import { Icon } from '../../shared/components/Icon'
 import { useAuth } from './useAuth'
 
 const initialValues = {
@@ -39,70 +40,61 @@ export function AuthPage() {
     try {
       if (isRegister) {
         if (values.password !== values.confirmPassword) {
-          throw new Error('As senhas informadas nao conferem.')
+          throw new Error('As senhas informadas não conferem.')
         }
 
         await register({ email: values.email, password: values.password })
-        setMessage('Conta criada com sucesso. Voce ja pode entrar.')
+        setMessage('Conta criada. Entre com seu e-mail e senha.')
         setMode('login')
         setValues({ ...initialValues, email: values.email })
       } else {
         await login({ email: values.email, password: values.password })
       }
     } catch (err) {
-      setError(err.message || 'Nao foi possivel autenticar.')
+      setError(err.message || 'Não foi possível autenticar.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <main className="auth-page">
-      <section className="auth-visual">
-        <div className="auth-brand">
-          <span className="brand-mark">.   Box</span>
-          <strong>BoxPK CM</strong>
+    <main className="auth">
+      <aside className="auth-side">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">
+            <Icon name="box" size={18} />
+          </span>
+          <div className="brand-text">
+            <strong>BoxPK CM</strong>
+            <span>Gestão TCG</span>
+          </div>
         </div>
 
-        <div className="auth-copy">
-          <span>Gestao protegida - BoxPK CM</span>
-          <h1>Controle seu catalogo, estoque e compras com seguranca.</h1>
-          <p>
-            Conecte-se à sua conta para ter acesso a todas as funcionalidades do BoxPK CM. Caso não tenha uma conta, registre-se para começar a utilizar o sistema.
+        <div className="auth-statement">
+          <h1>Catálogo, estoque e compras de cartas em um só lugar.</h1>
+          <ul>
+            <li>Cadastro de produtos, jogos e coleções</li>
+            <li>Saldo de estoque com histórico de movimentações</li>
+            <li>Compras com entrada automática no estoque</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section className="auth-main" aria-label={isRegister ? 'Criar conta' : 'Entrar'}>
+        <div className="auth-box">
+          <h2>{isRegister ? 'Criar conta' : 'Entrar'}</h2>
+          <p className="auth-lead">
+            {isRegister ? 'Cada conta tem seus próprios dados, isolados dos demais usuários.' : 'Acesse o painel com seu e-mail e senha.'}
           </p>
-        </div>
-      </section>
 
-      <section className="auth-panel" aria-label={isRegister ? 'Registro' : 'Login'}>
-        <div className="auth-card">
-          <div className="auth-header">
-            <span>{isRegister ? 'Criar acesso' : 'Bem-vindo'}</span>
-            <h2>{isRegister ? 'Registrar conta' : 'Entrar no painel'}</h2>
+          <div className="stack">
+            <Alert type="error">{error}</Alert>
+            <Alert type="success">{message}</Alert>
           </div>
 
-          <div className="auth-tabs">
-            <button
-              type="button"
-              className={!isRegister ? 'active' : ''}
-              onClick={() => changeMode('login')}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              className={isRegister ? 'active' : ''}
-              onClick={() => changeMode('register')}
-            >
-              Registro
-            </button>
-          </div>
-
-          <Alert type="error">{error}</Alert>
-          <Alert type="success">{message}</Alert>
-
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className="form-stack" onSubmit={handleSubmit}>
             <label className="field">
-              <span>E-mail</span>
+              <span className="field-label">E-mail</span>
               <input
                 name="email"
                 type="email"
@@ -110,11 +102,12 @@ export function AuthPage() {
                 value={values.email}
                 onChange={handleChange}
                 required
+                autoFocus
               />
             </label>
 
             <label className="field">
-              <span>Senha</span>
+              <span className="field-label">Senha</span>
               <input
                 name="password"
                 type="password"
@@ -128,7 +121,7 @@ export function AuthPage() {
 
             {isRegister ? (
               <label className="field">
-                <span>Confirmar senha</span>
+                <span className="field-label">Confirmar senha</span>
                 <input
                   name="confirmPassword"
                   type="password"
@@ -141,10 +134,17 @@ export function AuthPage() {
               </label>
             ) : null}
 
-            <button type="submit" className="primary-button" disabled={loading}>
-              {loading ? 'Aguarde...' : isRegister ? 'Criar conta' : 'Entrar'}
+            <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+              {loading ? 'Aguarde…' : isRegister ? 'Criar conta' : 'Entrar'}
             </button>
           </form>
+
+          <p className="auth-switch">
+            {isRegister ? 'Já possui conta?' : 'Ainda não tem conta?'}{' '}
+            <button type="button" className="link" onClick={() => changeMode(isRegister ? 'login' : 'register')}>
+              {isRegister ? 'Entrar' : 'Criar conta'}
+            </button>
+          </p>
         </div>
       </section>
     </main>

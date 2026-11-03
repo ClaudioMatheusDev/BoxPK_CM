@@ -155,5 +155,18 @@ namespace BoxPKCM.Tests
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => ctx.SaveChangesAsync());
         }
+
+        [Fact]
+        public async Task Cadastro_de_usuario_funciona_sem_tenant_na_requisicao()
+        {
+            using var db = new TestDb();
+            db.Tenant.TenantId = Guid.Empty; // registro é anônimo: ainda não há claim de tenant
+
+            await using var ctx = db.CreateContext();
+            ctx.Users.Add(new Application.Users.ApplicationUser { UserName = "a@a.com", Email = "a@a.com", TenantId = Guid.NewGuid() });
+
+            await ctx.SaveChangesAsync();
+            Assert.Equal(1, await ctx.Users.CountAsync());
+        }
     }
 }
