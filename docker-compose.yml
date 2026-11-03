@@ -7,7 +7,7 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${SA_PASSWORD}
     ports:
-      - "1433:1433"
+      - "127.0.0.1:1433:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
     healthcheck:
@@ -22,9 +22,12 @@ services:
       context: .
       dockerfile: src/WebApi/Dockerfile
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       APPLY_MIGRATIONS: "true"
       Jwt__Key: ${Jwt__Key}
+      Auth__AllowRegistration: ${ALLOW_REGISTRATION:-true}
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:5173}
+      Cors__AllowedOrigins__1: http://127.0.0.1:5173
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=BoxPK_CM;User Id=sa;Password=${SA_PASSWORD};Encrypt=False;TrustServerCertificate=True
     ports:
       - "5236:5160"

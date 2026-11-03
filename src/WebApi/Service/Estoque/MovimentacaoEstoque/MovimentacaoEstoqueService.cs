@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApi.Service
 {
-    public class MovimentacaoEstoqueService : IMovimentacaoEstoque
+    public class MovimentacaoEstoqueService : IMovimentacaoEstoqueService
     {
         private readonly AppDbContext _context;
 
@@ -15,62 +16,76 @@ namespace WebApi.Service
             _context = context;
         }
 
-        public async Task<int> CriarMovimentacaoEstoque(
-     MovimentacaoEstoqueCriarDto movimentacaoEstoqueCriarDto)
+        public async Task<int> CriarMovimentacaoEstoque(MovimentacaoEstoqueCriarDto dto)
         {
-            var estoque = await _context.Estoques.FirstOrDefaultAsync(e => e.IDProduto == movimentacaoEstoqueCriarDto.IDProduto);
+            if (dto.Quantidade <= 0)
+            {
+                throw new BusinessException("A quantidade da movimentação deve ser maior que zero.");
+            }
+
+            var estoque = await _context.Estoques.FirstOrDefaultAsync(e => e.IDProduto == dto.IDProduto);
 
             if (estoque is null)
             {
-                throw new Exception("Estoque não encontrado.");
+                throw new NotFoundException("Estoque não encontrado.");
             }
 
-            if (movimentacaoEstoqueCriarDto.Quantidade <= 0)
-            {
-                throw new Exception("A quantidade da movimentação deve ser maior que zero.");
-            }
-
-            var quantidadeAnterior = estoque.QuantidadeAtual;
-            var quantidadePosterior = quantidadeAnterior;
-
-            if (movimentacaoEstoqueCriarDto.TipoMovimentacao == TipoMovimentacao.Entrada)
-            {
-                quantidadePosterior = quantidadeAnterior + movimentacaoEstoqueCriarDto.Quantidade;
-            }
-
-            if (movimentacaoEstoqueCriarDto.TipoMovimentacao == TipoMovimentacao.Saida)
-            {
-                if (movimentacaoEstoqueCriarDto.Quantidade > quantidadeAnterior)
-                {
-                    throw new Exception("Não é possível realizar uma saída maior que o saldo atual.");
-                }
-
-                quantidadePosterior = quantidadeAnterior - movimentacaoEstoqueCriarDto.Quantidade;
-            }
-
-            estoque.QuantidadeAtual = quantidadePosterior;
-
-            var movimentacao = new MovimentacaoEstoque
-            {
-                IDProduto = movimentacaoEstoqueCriarDto.IDProduto,
-                TipoMovimentacao = movimentacaoEstoqueCriarDto.TipoMovimentacao,
-                QuantidadeAnterior = quantidadeAnterior,
-                Quantidade = movimentacaoEstoqueCriarDto.Quantidade,
-                QuantidadePosterior = quantidadePosterior,
-                Motivo = movimentacaoEstoqueCriarDto.Motivo,
-                Observacao = movimentacaoEstoqueCriarDto.Observacao
-            };
-
+            var movimentacao = AplicarMovimentacao(estoque, dto.TipoMovimentacao, dto.Quantidade, dto.Motivo, dto.Observacao);
             _context.MovimentacaoEstoques.Add(movimentacao);
 
-            await _context.SaveChangesAsync();
+            await SalvarComConcorrencia();
 
             return movimentacao.IDMovimentacao;
         }
 
-        public async Task<List<MovimentacaoEstoque>> ListarMovimentacao()
+        /// <summary>
+        /// Regra única de movimentação: valida o saldo, atualiza o estoque e devolve o registro de histórico.
+        /// Reutilizada pelo recebimento de compras.
+        /// </summary>
+        public static MovimentacaoEstoque AplicarMovimentacao(
+            Estoque estoque, TipoMovimentacao tipo, int quantidade, string? motivo, string? observacao)
         {
-            var movimentacao = await _context.MovimentacaoEstoques.ToListAsync();
+            var anterior = estoque.QuantidadeAtual;
+            var posterior = tipo switch
+            {
+                TipoMovimentacao.Entrada => anterior + quantidade,
+                TipoMovimentacao.Saida when quantidade > anterior =>
+                    throw new BusinessException("Não é possível realizar uma saída maior que o saldo atual."),
+                TipoMovimentacao.Saida => anterior - quantidade,
+                _ => anterior
+            };
+
+            estoque.QuantidadeAtual = posterior;
+            estoque.DataAtualizacao = DateTime.Now;
+
+            return new MovimentacaoEstoque
+            {
+                IDProduto = estoque.IDProduto,
+                TipoMovimentacao = tipo,
+                QuantidadeAnterior = anterior,
+                Quantidade = quantidade,
+                QuantidadePosterior = posterior,
+                Motivo = motivo,
+                Observacao = observacao
+            };
+        }
+
+        private async Task SalvarComConcorrencia()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException("O estoque foi alterado por outra operação. Tente novamente.");
+            }
+        }
+
+        public async Task<List<MovimentacaoEstoque>> ListarMovimentacao(int? page = null, int? pageSize = null)
+        {
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var movimentacao = await _context.MovimentacaoEstoques.AsNoTracking().OrderByDescending(x => x.IDMovimentacao).Skip(skip).Take(take).ToListAsync();
 
             return movimentacao;
         }
@@ -81,7 +96,7 @@ namespace WebApi.Service
 
             if (movimentacao is null)
             {
-                throw new Exception("Movimentação não encontrada");
+                throw new NotFoundException("Movimentação não encontrada");
             }
 
             return movimentacao;
@@ -93,7 +108,7 @@ namespace WebApi.Service
 
             if (movimentacao is null)
             {
-                throw new Exception("Movimentação não encontrada");
+                throw new NotFoundException("Movimentação não encontrada");
             }
 
             movimentacao.Motivo = movimentacaoEstoqueAtualizarDto.Motivo;
@@ -111,35 +126,32 @@ namespace WebApi.Service
 
             if (movimentacao is null)
             {
-                throw new Exception("Movimentação não encontrada");
+                throw new NotFoundException("Movimentação não encontrada");
             }
 
             var estoque = await _context.Estoques.FirstOrDefaultAsync(e => e.IDProduto == movimentacao.IDProduto);
 
             if (estoque is null)
             {
-                throw new Exception("Movimentação não encontrada");
+                throw new NotFoundException("Movimentação não encontrada");
             }
 
 
-            var quantidadeAnterior = estoque.QuantidadeAtual;
+            // Excluir uma movimentação desfaz o seu efeito no saldo; nunca pode deixá-lo negativo.
+            var saldoAjustado = movimentacao.TipoMovimentacao == TipoMovimentacao.Saida
+                ? estoque.QuantidadeAtual + movimentacao.Quantidade
+                : estoque.QuantidadeAtual - movimentacao.Quantidade;
 
-            var quantidadeAjustadaSaida = quantidadeAnterior + movimentacao.Quantidade;
-            var quantidadeAjustadaEntrada = quantidadeAnterior - movimentacao.Quantidade;
-
-            if (movimentacao.TipoMovimentacao == TipoMovimentacao.Saida)
+            if (saldoAjustado < 0)
             {
-
-                estoque.QuantidadeAtual = quantidadeAjustadaSaida;
+                throw new BusinessException("Não é possível excluir a movimentação: o saldo ficaria negativo.");
             }
 
-            if (movimentacao.TipoMovimentacao == TipoMovimentacao.Entrada)
-            {
-                estoque.QuantidadeAtual = quantidadeAjustadaEntrada;
-            }
+            estoque.QuantidadeAtual = saldoAjustado;
+            estoque.DataAtualizacao = DateTime.Now;
 
             _context.MovimentacaoEstoques.Remove(movimentacao);
-            await _context.SaveChangesAsync();
+            await SalvarComConcorrencia();
 
             return true;
         }

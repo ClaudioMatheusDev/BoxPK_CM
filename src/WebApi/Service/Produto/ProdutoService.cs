@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Application.Dtos.Produto;
 using Domain.Entities;
 using Domain.Enums;
@@ -39,9 +40,10 @@ namespace WebApi.Service
             return produto.IDProduto;
         }
 
-        public async Task<List<Produto>> ListarProdutos()
+        public async Task<List<Produto>> ListarProdutos(int? page = null, int? pageSize = null)
         {
-            var produto = await _context.Produtos.ToListAsync();
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var produto = await _context.Produtos.AsNoTracking().OrderBy(x => x.IDProduto).Skip(skip).Take(take).ToListAsync();
 
 
             return produto;
@@ -53,7 +55,7 @@ namespace WebApi.Service
 
             if (produto is null)
             {
-                throw new Exception("Não foi encontrado o produto com o ID digitado!");
+                throw new NotFoundException("Não foi encontrado o produto com o ID digitado!");
             }
             return produto;
         }
@@ -64,7 +66,7 @@ namespace WebApi.Service
 
             if (produto is null)
             {
-                throw new Exception("Não foi encontrado o produto com o ID digitado!");
+                throw new NotFoundException("Não foi encontrado o produto com o ID digitado!");
             }
 
             produto.Nome = produtoAtualizarDto.Nome;
@@ -89,7 +91,7 @@ namespace WebApi.Service
 
             if (produto is null)
             {
-                throw new Exception("Não foi encontrado o produto com o ID digitado!");
+                throw new NotFoundException("Não foi encontrado o produto com o ID digitado!");
             }
 
             _context.Produtos.Remove(produto);

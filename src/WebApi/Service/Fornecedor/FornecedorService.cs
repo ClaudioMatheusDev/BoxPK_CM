@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -33,13 +34,14 @@ namespace WebApi.Service
             return fornecedor.IDFornecedor;
         }
 
-        public async Task<List<Fornecedor>> ListarFornecedores()
+        public async Task<List<Fornecedor>> ListarFornecedores(int? page = null, int? pageSize = null)
         {
-            var fornecedor = await _context.Fornecedores.ToListAsync();
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var fornecedor = await _context.Fornecedores.AsNoTracking().OrderBy(x => x.IDFornecedor).Skip(skip).Take(take).ToListAsync();
 
             if (fornecedor is null)
             {
-                throw new Exception("Não há fornecedor cadastrados.");
+                throw new NotFoundException("Não há fornecedor cadastrados.");
             }
 
             return fornecedor;
@@ -52,7 +54,7 @@ namespace WebApi.Service
 
             if (fornecedor is null)
             {
-                throw new Exception("Não há fornecedores cadastrados.");
+                throw new NotFoundException("Não há fornecedores cadastrados.");
             }
 
             return fornecedor;
@@ -65,7 +67,7 @@ namespace WebApi.Service
 
             if (fornecedor is null)
             {
-                throw new Exception("Nenhuma fornecedor encontra nessa ID");
+                throw new NotFoundException("Nenhuma fornecedor encontra nessa ID");
             }
 
             fornecedor.Nome = fornecedorAtualizarDto.Nome;
@@ -88,7 +90,7 @@ namespace WebApi.Service
 
             if (fornecedor is null)
             {
-                throw new Exception("Nenhuma fornecedor encontra nessa ID");
+                throw new NotFoundException("Nenhuma fornecedor encontra nessa ID");
             }
 
             _context.Remove(fornecedor);

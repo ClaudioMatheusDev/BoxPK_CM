@@ -1,0 +1,18 @@
+# Uso: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Substitui o frontend de desenvolvimento (Vite) por build estático servido pelo nginx.
+services:
+  api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN:?Defina CORS_ORIGIN com a URL pública do frontend}
+
+  frontend:
+    build:
+      context: ./src/frontend/FrontEnd
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    ports: !override
+      - "80:80"
+    volumes: !reset []
+    environment: !reset {}

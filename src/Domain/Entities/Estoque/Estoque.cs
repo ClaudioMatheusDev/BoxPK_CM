@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities
 {
@@ -12,6 +13,8 @@ namespace Domain.Entities
         public int QuantidadeMaxima { get; set; }
         public DateTime DataInclusao { get; set; } = DateTime.Now;
         public DateTime DataAtualizacao { get; set; }
+        [JsonIgnore]
+        public byte[]? RowVersion { get; set; }
         public Produto Produto { get; set; } = null!;
     }
 }

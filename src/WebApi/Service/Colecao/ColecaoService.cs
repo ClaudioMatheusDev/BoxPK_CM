@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Data;
@@ -35,13 +36,14 @@ namespace WebApi.Service
             return colecao.IDColecao;
         }
 
-        public async Task<List<Colecao>> ListarColecao()
+        public async Task<List<Colecao>> ListarColecao(int? page = null, int? pageSize = null)
         {
-            var colecao = await _context.Colecoes.ToListAsync();
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var colecao = await _context.Colecoes.AsNoTracking().OrderBy(x => x.IDColecao).Skip(skip).Take(take).ToListAsync();
 
             if (colecao is null)
             {
-                throw new Exception("Não há colecao cadastrados.");
+                throw new NotFoundException("Não há colecao cadastrados.");
             }
 
             return colecao;
@@ -53,7 +55,7 @@ namespace WebApi.Service
 
             if (colecao == null)
             {
-                throw new Exception("Nenhuma colecao encontrada com esse ID!");
+                throw new NotFoundException("Nenhuma colecao encontrada com esse ID!");
             }
 
 
@@ -66,7 +68,7 @@ namespace WebApi.Service
 
             if (colecao == null)
             {
-                throw new Exception("Nenhuma colecao encontrada com esse ID!");
+                throw new NotFoundException("Nenhuma colecao encontrada com esse ID!");
             }
 
             colecao.Sigla = colecaoAtualizarDto.Sigla;
@@ -88,7 +90,7 @@ namespace WebApi.Service
 
             if (colecao == null)
             {
-                throw new Exception("Nenhuma colecao encontrada com esse ID!");
+                throw new NotFoundException("Nenhuma colecao encontrada com esse ID!");
             }
 
             _context.Colecoes.Remove(colecao);

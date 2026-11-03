@@ -1,4 +1,4 @@
-﻿using Application.Users;
+using Application.Users;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,9 +19,6 @@ namespace WebApi.Service.Auth
         public string CreateAccessToken(ApplicationUser user)
         {
             var jwtKey = _config["Jwt:Key"];
-            if (string.IsNullOrWhiteSpace(jwtKey))
-                jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-
             if (string.IsNullOrWhiteSpace(jwtKey))
                 throw new InvalidOperationException("Chave JWT não configurada");
 

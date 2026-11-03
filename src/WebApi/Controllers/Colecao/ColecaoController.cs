@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -24,15 +24,15 @@ namespace WebApi.Controllers.Colecao
         {
             var colecao = await _colecaoService.CriarColecao(colecaoCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = colecao });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarColecao() 
+        public async Task<IActionResult> ListarColecao([FromQuery] int? page, [FromQuery] int? pageSize) 
         {
-            var colecao = await _colecaoService.ListarColecao();
+            var resultado = await _colecaoService.ListarColecao(page, pageSize);
 
-            return Ok(colecao);
+            return Ok(resultado);
         }
 
         [HttpGet("{IDColecao}")]
@@ -46,17 +46,17 @@ namespace WebApi.Controllers.Colecao
         [HttpPut("{IDColecao}")]
         public async Task<IActionResult> AtualizarColecao(int IDColecao, ColecaoAtualizarDto colecaoAtualizarDto) 
         {
-            var colecao = await _colecaoService.AtualizarColecao(IDColecao, colecaoAtualizarDto);
+            await _colecaoService.AtualizarColecao(IDColecao, colecaoAtualizarDto);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{IDColecao}")]
         public async Task<IActionResult> DeletarColecao(int IDColecao)
         {
-            var colecao = await _colecaoService.DeletarColecao(IDColecao);
+            await _colecaoService.DeletarColecao(IDColecao);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

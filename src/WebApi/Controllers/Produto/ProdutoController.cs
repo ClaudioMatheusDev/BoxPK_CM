@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Application.Dtos.Produto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,15 +24,15 @@ namespace WebApi.Controllers.Produto
         {
             var produto = await _produtoService.CriarProduto(produtoCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = produto });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarProdutos()
+        public async Task<IActionResult> ListarProdutos([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var produto = await _produtoService.ListarProdutos();
+            var resultado = await _produtoService.ListarProdutos(page, pageSize);
 
-            return Ok(produto);
+            return Ok(resultado);
         }
 
         [HttpGet("{IDproduto}")]
@@ -45,19 +45,19 @@ namespace WebApi.Controllers.Produto
 
         [HttpPut("{IDProduto}")]
 
-        public async Task<IActionResult> AtualiarProduto(int IDProduto, ProdutoAtualizarDto produtoAtualizarDto)
+        public async Task<IActionResult> AtualizarProduto(int IDProduto, ProdutoAtualizarDto produtoAtualizarDto)
         {
-            var produto = await _produtoService.AtualizarProduto(IDProduto, produtoAtualizarDto);
+            await _produtoService.AtualizarProduto(IDProduto, produtoAtualizarDto);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{IDProduto}")]
         public async Task<IActionResult> DeletarProduto(int IDProduto) 
         {
-            var produto = await _produtoService.DeletarProduto(IDProduto);
+            await _produtoService.DeletarProduto(IDProduto);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

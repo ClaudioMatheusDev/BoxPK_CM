@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Application.Dtos.Categoria;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,14 +24,13 @@ namespace WebApi.Controllers.Categoria
         {
             var categoria = await _categoriaService.CriarCategoria(categoriaCriarDto);
 
-
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = categoria });
         }
 
         [HttpGet]
-        public async Task<IActionResult> BuscarCategorias()
+        public async Task<IActionResult> BuscarCategorias([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var categoria = await _categoriaService.ListarCategorias();
+            var categoria = await _categoriaService.ListarCategorias(page, pageSize);
 
             if (categoria is null)
             {

@@ -1,45 +1,36 @@
 ﻿using Application.Dtos;
-using Application.Users;
-using Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApi.Service;
+using Microsoft.AspNetCore.RateLimiting;
+using WebApi.Service.Auth;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ITokenService _tokenService;
-        private readonly AppDbContext _db;
+        private const string RefreshCookie = "ft_refresh";
+
+        private readonly IAuthService _authService;
         private readonly IConfiguration _configuration;
 
-        public AuthController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            ITokenService tokenService,
-            AppDbContext db,
-            IConfiguration configuration)
+        public AuthController(IAuthService authService, IConfiguration configuration)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _tokenService = tokenService;
-            _db = db;
+            _authService = authService;
             _configuration = configuration;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            // Cada usuário recebe um tenant próprio no cadastro. Não aceite TenantId do cliente.
-            var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, TenantId = Guid.NewGuid() };
-            var result = await _userManager.CreateAsync(user, dto.Password);
+            // Cadastro aberto por padrão; defina Auth:AllowRegistration=false para desativar.
+            if (!_configuration.GetValue("Auth:AllowRegistration", true))
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "O cadastro de novos usuários está desativado." });
+
+            var result = await _authService.RegisterAsync(dto);
             if (!result.Succeeded) return BadRequest(result.Errors);
             return Ok();
         }
@@ -47,106 +38,55 @@ namespace WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null) return Unauthorized();
-
-            var pw = await _userManager.CheckPasswordAsync(user, dto.Password);
-            if (!pw) return Unauthorized();
-
-            if (user.TenantId == Guid.Empty)
-            {
-                user.TenantId = Guid.NewGuid();
-                var updateResult = await _userManager.UpdateAsync(user);
-                if (!updateResult.Succeeded) return BadRequest(updateResult.Errors);
-            }
-
-            var access = _tokenService.CreateAccessToken(user);
-            var (refresh, raw) = _tokenService.CreateRefreshToken(user.Id, GetRefreshTokenExpirationDays());
-            _db.RefreshTokens.Add(refresh);
-            await _db.SaveChangesAsync();
-
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = Request.IsHttps,
-                SameSite = SameSiteMode.Strict,
-                Expires = refresh.ExpiresAt
-            };
-            Response.Cookies.Append("ft_refresh", raw, cookieOptions);
-
-            return Ok(new { accessToken = access });
+            var result = await _authService.LoginAsync(dto);
+            return ToResponse(result);
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(RefreshDto dto)
         {
-            // Prefer cookie; fall back to body if provided
-            var incoming = string.Empty;
-            if (Request.Cookies.ContainsKey("ft_refresh")) incoming = Request.Cookies["ft_refresh"]!;
-            if (string.IsNullOrWhiteSpace(incoming) && !string.IsNullOrWhiteSpace(dto.RefreshToken)) incoming = dto.RefreshToken;
-
+            // Prefere o cookie; usa o corpo da requisição como alternativa.
+            var incoming = Request.Cookies.TryGetValue(RefreshCookie, out var cookie) ? cookie : null;
+            if (string.IsNullOrWhiteSpace(incoming)) incoming = dto.RefreshToken;
             if (string.IsNullOrWhiteSpace(incoming)) return Unauthorized();
 
-            var hash = _tokenService.ComputeRefreshTokenHash(incoming);
-            var rt = await _db.RefreshTokens.FirstOrDefaultAsync(x => x.Token == hash && !x.Revoked);
-            if (rt == null || rt.ExpiresAt < DateTime.UtcNow) return Unauthorized();
-
-            var user = await _userManager.FindByIdAsync(rt.UserId.ToString());
-            if (user == null) return Unauthorized();
-
-            if (user.TenantId == Guid.Empty)
-            {
-                user.TenantId = Guid.NewGuid();
-                var updateResult = await _userManager.UpdateAsync(user);
-                if (!updateResult.Succeeded) return BadRequest(updateResult.Errors);
-            }
-
-            rt.Revoked = true; // rotate
-            var (newRefresh, newRaw) = _tokenService.CreateRefreshToken(user.Id, GetRefreshTokenExpirationDays());
-            _db.RefreshTokens.Add(newRefresh);
-            await _db.SaveChangesAsync();
-
-            // replace cookie
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = Request.IsHttps,
-                SameSite = SameSiteMode.Strict,
-                Expires = newRefresh.ExpiresAt
-            };
-            Response.Cookies.Append("ft_refresh", newRaw, cookieOptions);
-
-            var access = _tokenService.CreateAccessToken(user);
-            return Ok(new { accessToken = access });
+            var result = await _authService.RefreshAsync(incoming);
+            return ToResponse(result);
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            if (Request.Cookies.TryGetValue("ft_refresh", out var raw) && !string.IsNullOrWhiteSpace(raw))
+            if (Request.Cookies.TryGetValue(RefreshCookie, out var raw) && !string.IsNullOrWhiteSpace(raw))
             {
-                var hash = _tokenService.ComputeRefreshTokenHash(raw);
-                var rt = await _db.RefreshTokens.FirstOrDefaultAsync(x => x.Token == hash && !x.Revoked);
-                if (rt != null)
-                {
-                    rt.Revoked = true;
-                    await _db.SaveChangesAsync();
-                }
+                await _authService.LogoutAsync(raw);
             }
 
-            Response.Cookies.Delete("ft_refresh", new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = Request.IsHttps,
-                SameSite = SameSiteMode.Strict
-            });
+            Response.Cookies.Delete(RefreshCookie, BuildCookieOptions(null));
             return NoContent();
         }
 
-        private int GetRefreshTokenExpirationDays()
+        private IActionResult ToResponse(AuthResult result)
         {
-            var configuredValue = _configuration["Jwt:RefreshTokenExpirationDays"];
-            return int.TryParse(configuredValue, out var days) && days > 0 ? days : 7;
+            switch (result.Status)
+            {
+                case AuthStatus.LockedOut:
+                    return StatusCode(StatusCodes.Status429TooManyRequests,
+                        new { message = "Muitas tentativas inválidas. Tente novamente mais tarde." });
+                case AuthStatus.Success:
+                    Response.Cookies.Append(RefreshCookie, result.RawRefreshToken!, BuildCookieOptions(result.RefreshToken!.ExpiresAt));
+                    return Ok(new { accessToken = result.AccessToken });
+                default:
+                    return Unauthorized();
+            }
         }
+
+        private CookieOptions BuildCookieOptions(DateTime? expires) => new()
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Strict,
+            Expires = expires
+        };
     }
 }

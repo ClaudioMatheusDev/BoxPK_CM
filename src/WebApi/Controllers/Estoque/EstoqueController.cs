@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -22,16 +22,16 @@ namespace WebApi.Controllers.Estoque
         {
             var estoque = await _estoqueService.CriarEstoque(estoqueCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = estoque });
 
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarEstoque()
+        public async Task<IActionResult> ListarEstoque([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var estoque = await _estoqueService.ListarEstoque();
+            var resultado = await _estoqueService.ListarEstoque(page, pageSize);
 
-            return Ok(estoque);
+            return Ok(resultado);
         }
 
         [HttpGet("{IDEstoque}")]
@@ -44,18 +44,17 @@ namespace WebApi.Controllers.Estoque
         [HttpDelete("{IDEstoque}")]
         public async Task<IActionResult> DeletarEstoque(int IDEstoque)
         {
-            var estoque = await _estoqueService.DeletarEstoque(IDEstoque);
+            await _estoqueService.DeletarEstoque(IDEstoque);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPut("{IDEstoque}")]
         public async Task<IActionResult> AtualizarEstoque(int IDEstoque, EstoqueAtualizarDto estoqueAtualizarDto)
         {
+            await _estoqueService.AtualizarEstoquePorID(IDEstoque, estoqueAtualizarDto);
 
-            var estoque = await _estoqueService.AtualizarEstoquePorID(IDEstoque, estoqueAtualizarDto);
-
-            return Ok();
+            return NoContent();
 
         }
     }

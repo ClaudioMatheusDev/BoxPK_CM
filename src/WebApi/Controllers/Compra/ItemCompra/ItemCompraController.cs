@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -18,19 +18,19 @@ namespace WebApi.Controllers.Compra.ItemCompra
         }
 
         [HttpPost]
-        public async Task<IActionResult> CriarItemCompra(ItemCompraCriarDto itemCompraCriaDto)
+        public async Task<IActionResult> CriarItemCompra(ItemCompraCriarDto itemCompraCriarDto)
         {
-            var itemCompra = await _service.CriarItemCompra(itemCompraCriaDto);
+            var itemCompra = await _service.CriarItemCompra(itemCompraCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = itemCompra });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarItemCompras()
+        public async Task<IActionResult> ListarItemCompras([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var itemCompra = await _service.ListarItemCompra();
+            var resultado = await _service.ListarItemCompra(page, pageSize);
 
-            return Ok(itemCompra);
+            return Ok(resultado);
         }
 
         [HttpGet("{IDItemCompra}")]
@@ -44,17 +44,17 @@ namespace WebApi.Controllers.Compra.ItemCompra
         [HttpPut("{IDItemCompra}")]
         public async Task<IActionResult> AtualizarItemCompra(int IDItemCompra, ItemCompraAtualizarDto itemCompraAtualizarDto)
         {
-            var itemCompra = await _service.AtualizarItemCompraEstoquePorID(IDItemCompra, itemCompraAtualizarDto);
+            await _service.AtualizarItemCompraPorID(IDItemCompra, itemCompraAtualizarDto);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{IDItemCompra}")]
         public async Task<IActionResult> DeletarItemCompra(int IDItemCompra)
         {
-            var itemCompra = await _service.DeletarItemCompra(IDItemCompra);
+            await _service.DeletarItemCompra(IDItemCompra);
 
-            return Ok();
+            return NoContent();
         }
 
 
