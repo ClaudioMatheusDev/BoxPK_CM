@@ -1,24 +1,40 @@
+import { useState } from 'react'
+import { useAuth } from '../../features/auth/useAuth'
+import { getEmailFromToken } from '../utils/token'
+import { Icon } from './Icon'
+
 export function Shell({ sections, activeSection, onSectionChange, onLogout, children }) {
+  const { accessToken } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
+
   const groupedSections = sections.reduce((groups, section) => {
     const group = section.group ?? 'Geral'
     groups[group] = [...(groups[group] ?? []), section]
     return groups
   }, {})
 
-  const currentLabel = sections.find((section) => section.id === activeSection)?.label ?? 'Dashboard'
+  const current = sections.find((section) => section.id === activeSection)
+  const email = getEmailFromToken(accessToken)
+
+  const select = (id) => {
+    onSectionChange(id)
+    setMenuOpen(false)
+  }
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div className="shell">
+      <aside className={`sidebar${menuOpen ? ' open' : ''}`}>
         <div className="brand">
-          <span className="brand-mark">.   Box</span>
-          <div>
+          <span className="brand-mark" aria-hidden="true">
+            <Icon name="box" size={18} />
+          </span>
+          <div className="brand-text">
             <strong>BoxPK CM</strong>
-            <span>Controle de cartas TCG</span>
+            <span>Gestão TCG</span>
           </div>
         </div>
 
-        <nav className="nav-list" aria-label="Modulos">
+        <nav className="nav" aria-label="Módulos">
           {Object.entries(groupedSections).map(([group, items]) => (
             <div className="nav-group" key={group}>
               <p>{group}</p>
@@ -26,11 +42,11 @@ export function Shell({ sections, activeSection, onSectionChange, onLogout, chil
                 <button
                   type="button"
                   key={section.id}
-                  className={activeSection === section.id ? 'active' : ''}
-                  onClick={() => onSectionChange(section.id)}
-                  title={section.label}
+                  className={activeSection === section.id ? 'nav-item active' : 'nav-item'}
+                  aria-current={activeSection === section.id ? 'page' : undefined}
+                  onClick={() => select(section.id)}
                 >
-                  <span>{section.icon}</span>
+                  <Icon name={section.icon} size={17} />
                   {section.label}
                 </button>
               ))}
@@ -38,26 +54,40 @@ export function Shell({ sections, activeSection, onSectionChange, onLogout, chil
           ))}
         </nav>
 
-        <button type="button" className="logout-button" onClick={onLogout}>
-          Sair
-        </button>
+        <div className="sidebar-user">
+          <span className="avatar" aria-hidden="true">
+            {(email || 'U').slice(0, 1).toUpperCase()}
+          </span>
+          <span className="user-email" title={email}>
+            {email || 'Usuário'}
+          </span>
+          <button type="button" className="icon-button on-dark" onClick={onLogout} title="Sair" aria-label="Sair">
+            <Icon name="logout" size={17} />
+          </button>
+        </div>
       </aside>
 
-      <main className="content">
-        <div className="content-shell">
-          <header className="content-header">
-            <div>
-              <span>Operações</span>
-              <h2>{currentLabel}</h2>
-            </div>
-            <div className="header-badges">
-              <span className="status-pill success">Sistema ativo</span>
-              <span className="status-pill">Cloud sync</span>
-            </div>
-          </header>
-          {children}
-        </div>
-      </main>
+      {menuOpen ? <div className="scrim" onClick={() => setMenuOpen(false)} /> : null}
+
+      <div className="main">
+        <header className="topbar">
+          <button
+            type="button"
+            className="icon-button menu-toggle"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Abrir menu"
+          >
+            <Icon name="menu" />
+          </button>
+          <nav className="crumbs" aria-label="Localização">
+            <span>{current?.group}</span>
+            <span className="sep">/</span>
+            <strong>{current?.label}</strong>
+          </nav>
+        </header>
+
+        <main className="content">{children}</main>
+      </div>
     </div>
   )
 }

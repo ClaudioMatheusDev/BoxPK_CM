@@ -102,6 +102,15 @@ Variáveis usadas pelo projeto:
 - `Jwt__Key`: chave usada para assinar os tokens JWT
 - `VITE_API_BASE_URL`: URL base da API usada pelo frontend
 
+Há um modelo em `.env.example`. Variáveis opcionais:
+
+- `ALLOW_REGISTRATION` (`Auth__AllowRegistration`): `false` desativa o endpoint de cadastro
+- `CORS_ORIGIN` (`Cors__AllowedOrigins__N`): origens permitidas pelo CORS
+- `Https__Redirect`: `true` ativa o redirecionamento HTTPS da API
+- `ASPNETCORE_ENVIRONMENT`: ambiente da API (padrão `Development` no compose)
+
+A chave `Jwt__Key` precisa ter pelo menos 32 caracteres, caso contrário a API não inicia.
+
 > Importante: não versionar valores reais de `.env`, senhas ou chaves JWT.
 
 ## Executando com Docker Compose
@@ -205,6 +214,32 @@ Os recursos abaixo seguem o padrão REST com `POST`, `GET`, `GET /{id}`, `PUT /{
 - `/api/movimentacoestoque`
 - `/api/compra`
 - `/api/itemcompra`
+
+### Comportamento da API
+
+- **Multi-tenant:** cada usuário cadastrado recebe um `TenantId` (claim no JWT). Todas as entidades de negócio têm filtro global por tenant, então um usuário só enxerga e altera os próprios dados.
+- **Erros:** respostas no formato ProblemDetails (`title` com a mensagem): `404` não encontrado, `400` regra de negócio, `409` conflito/concorrência, `500` erro interno.
+- **Criação:** `POST` devolve `201` com `{ "id": ... }`; `PUT`/`DELETE` devolvem `204`.
+- **Paginação:** as listagens aceitam `?page=1&pageSize=100` (padrão: 500 itens, máximo 1000).
+- **Login:** bloqueio de 15 min após 5 senhas incorretas e rate limit de 20 req/min por IP nos endpoints de autenticação.
+- **Compras:** o `ValorTotal` é sempre a soma dos itens. Ao mudar o status de `Pendente` para `Confirmada`, a API gera uma entrada no estoque para cada item. Compras confirmadas/canceladas não podem mais ser alteradas, e confirmadas não podem ser excluídas.
+- **Estoque:** movimentações validam saldo e usam controle de concorrência (`RowVersion`); excluir uma movimentação que deixaria o saldo negativo é recusado.
+
+## Testes
+
+```bash
+dotnet test src/BoxPKCM.sln
+```
+
+Os testes (`src/BoxPKCM.Tests`) usam SQLite em memória com o modelo real e cobrem estoque, compras e isolamento por tenant. O workflow `.github/workflows/ci.yml` roda build, testes, lint e build do frontend.
+
+## Produção
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Serve o frontend como build estático via nginx (`Dockerfile.prod`) e roda a API em `Production`. Defina `CORS_ORIGIN` com a URL pública do frontend.
 
 ## Banco de dados e migrations
 

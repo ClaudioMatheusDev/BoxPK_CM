@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -30,9 +31,10 @@ namespace WebApi.Service
             return estoque.IDEstoque;
         }
 
-        public async Task<List<Estoque>> ListarEstoque()
+        public async Task<List<Estoque>> ListarEstoque(int? page = null, int? pageSize = null)
         {
-            var estoque = await _context.Estoques.ToListAsync();
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var estoque = await _context.Estoques.AsNoTracking().OrderBy(x => x.IDEstoque).Skip(skip).Take(take).ToListAsync();
 
             return estoque;
         }
@@ -43,7 +45,7 @@ namespace WebApi.Service
 
             if (estoque is null)
             {
-                throw new Exception("Não foi encontrando nenhum estoque com esse ID!");
+                throw new NotFoundException("Não foi encontrando nenhum estoque com esse ID!");
             }
 
             return estoque;
@@ -56,7 +58,7 @@ namespace WebApi.Service
 
             if (estoque is null)
             {
-                throw new Exception("Não foi encontrando nenhum estoque com esse ID!");
+                throw new NotFoundException("Não foi encontrando nenhum estoque com esse ID!");
             }
 
             estoque.IDProduto = estoqueAtualizarDto.IDProduto;
@@ -77,7 +79,7 @@ namespace WebApi.Service
 
             if (estoque is null)
             {
-                throw new Exception("Não foi encontrando nenhum estoque com esse ID!");
+                throw new NotFoundException("Não foi encontrando nenhum estoque com esse ID!");
             }
 
             _context.Estoques.Remove(estoque);

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { resourceDefinitions } from './core/resources'
 import { AuthPage } from './features/auth/AuthPage'
@@ -11,17 +11,17 @@ import { ResourcePage } from './shared/components/ResourcePage'
 import { Shell } from './shared/components/Shell'
 
 const sections = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'D', group: 'Principal' },
-  { id: 'vitrine', label: 'Vitrine', icon: 'V', group: 'Principal' },
-  { id: 'produtos', label: 'Produtos', icon: 'P', group: 'Catalogo', definition: resourceDefinitions.produtos },
-  { id: 'categorias', label: 'Categorias', icon: 'C', group: 'Catalogo', definition: resourceDefinitions.categorias },
-  { id: 'jogos', label: 'Jogos', icon: 'J', group: 'Catalogo', definition: resourceDefinitions.jogos },
-  { id: 'colecoes', label: 'Colecoes', icon: 'S', group: 'Catalogo', definition: resourceDefinitions.colecoes },
-  { id: 'fornecedores', label: 'Fornecedores', icon: 'F', group: 'Operacao', definition: resourceDefinitions.fornecedores },
-  { id: 'estoque', label: 'Estoque', icon: 'E', group: 'Operacao', definition: inventoryResources.estoque },
-  { id: 'movimentacoes', label: 'Movimentacoes', icon: 'M', group: 'Operacao', definition: inventoryResources.movimentacoes },
-  { id: 'compras', label: 'Compras', icon: 'R', group: 'Compras', definition: purchaseResources.compras },
-  { id: 'itensCompra', label: 'Itens Compra', icon: 'I', group: 'Compras', definition: purchaseResources.itensCompra },
+  { id: 'dashboard', label: 'Visão geral', icon: 'dashboard', group: 'Geral' },
+  { id: 'vitrine', label: 'Vitrine', icon: 'store', group: 'Geral' },
+  { id: 'produtos', label: 'Produtos', icon: 'box', group: 'Catálogo', definition: resourceDefinitions.produtos },
+  { id: 'categorias', label: 'Categorias', icon: 'tag', group: 'Catálogo', definition: resourceDefinitions.categorias },
+  { id: 'jogos', label: 'Jogos', icon: 'layers', group: 'Catálogo', definition: resourceDefinitions.jogos },
+  { id: 'colecoes', label: 'Coleções', icon: 'collection', group: 'Catálogo', definition: resourceDefinitions.colecoes },
+  { id: 'fornecedores', label: 'Fornecedores', icon: 'truck', group: 'Operação', definition: resourceDefinitions.fornecedores },
+  { id: 'estoque', label: 'Estoque', icon: 'warehouse', group: 'Operação', definition: inventoryResources.estoque },
+  { id: 'movimentacoes', label: 'Movimentações', icon: 'transfer', group: 'Operação', definition: inventoryResources.movimentacoes },
+  { id: 'compras', label: 'Compras', icon: 'receipt', group: 'Compras', definition: purchaseResources.compras },
+  { id: 'itensCompra', label: 'Itens de compra', icon: 'list', group: 'Compras', definition: purchaseResources.itensCompra },
 ]
 
 const resourcesByKey = {
@@ -33,10 +33,7 @@ const resourcesByKey = {
 function App() {
   const { isAuthenticated, logout } = useAuth()
   const [activeSection, setActiveSection] = useState('dashboard')
-  const currentSection = useMemo(
-    () => sections.find((section) => section.id === activeSection),
-    [activeSection],
-  )
+  const currentSection = sections.find((section) => section.id === activeSection)
 
   if (!isAuthenticated) {
     return <AuthPage />
@@ -50,11 +47,15 @@ function App() {
       onSectionChange={setActiveSection}
     >
       {activeSection === 'dashboard' ? (
-        <Dashboard />
+        <Dashboard onNavigate={setActiveSection} />
       ) : activeSection === 'vitrine' ? (
         <StorefrontPage />
       ) : (
-        <ResourcePage definition={currentSection.definition} resourcesByKey={resourcesByKey} />
+        <ResourcePage
+          key={activeSection}
+          definition={currentSection.definition}
+          resourcesByKey={resourcesByKey}
+        />
       )}
     </Shell>
   )

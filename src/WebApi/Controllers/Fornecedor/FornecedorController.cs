@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -23,13 +23,13 @@ namespace WebApi.Controllers.Fornecedor
         {
             var fornecedor = await _fornecedorService.CriarFornecedor(fornecedorCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = fornecedor });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarFornecedores()
+        public async Task<IActionResult> ListarFornecedores([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var fornecedor = await _fornecedorService.ListarFornecedores();
+            var fornecedor = await _fornecedorService.ListarFornecedores(page, pageSize);
 
             return Ok(fornecedor);
         }

@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Application.Dtos.Jogo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +24,13 @@ namespace WebApi.Controllers.Jogo
         {
             var jogo = await _fornecedorService.CriarJogo(jogoCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = jogo });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarJogos()
+        public async Task<IActionResult> ListarJogos([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var jogo = await _fornecedorService.ListarJogos();
+            var jogo = await _fornecedorService.ListarJogos(page, pageSize);
 
             return Ok(jogo);
         }

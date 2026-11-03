@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csp
 		{A3E27C16-6FBB-4D18-BC64-CC1082668CDD} = {A3E27C16-6FBB-4D18-BC64-CC1082668CDD}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxPKCM.Tests", "BoxPKCM.Tests\BoxPKCM.Tests.csproj", "{CFC936C3-CDBE-4557-8218-EAFD98865AE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,18 @@ Global
 		{80C33E66-D1F5-4644-AAD6-607C04FC4AE7}.Release|x64.Build.0 = Release|Any CPU
 		{80C33E66-D1F5-4644-AAD6-607C04FC4AE7}.Release|x86.ActiveCfg = Release|Any CPU
 		{80C33E66-D1F5-4644-AAD6-607C04FC4AE7}.Release|x86.Build.0 = Release|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Debug|x64.Build.0 = Debug|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Debug|x86.Build.0 = Debug|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Release|x64.ActiveCfg = Release|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Release|x64.Build.0 = Release|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Release|x86.ActiveCfg = Release|Any CPU
+		{CFC936C3-CDBE-4557-8218-EAFD98865AE3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

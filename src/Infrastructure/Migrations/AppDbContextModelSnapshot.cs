@@ -142,7 +142,12 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StatusCategoria")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IDCategoria");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Categorias");
                 });
@@ -177,9 +182,14 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StatusColecao")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IDColecao");
 
                     b.HasIndex("IDJogoTCG");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Colecoes");
                 });
@@ -204,6 +214,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StatusCompra")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("ValorTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -211,6 +224,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("IDCompra");
 
                     b.HasIndex("IDFornecedor");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Compras");
                 });
@@ -241,10 +256,20 @@ namespace Infrastructure.Migrations
                     b.Property<int>("QuantidadeMinima")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IDEstoque");
 
                     b.HasIndex("IDProduto")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Estoques");
                 });
@@ -282,7 +307,12 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IDFornecedor");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Fornecedores");
                 });
@@ -304,6 +334,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("ValorTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -317,6 +350,8 @@ namespace Infrastructure.Migrations
                     b.HasIndex("IDCompra");
 
                     b.HasIndex("IDProduto");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("ItensCompras");
                 });
@@ -345,7 +380,12 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StatusJogo")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IDJogoTCG");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Jogos");
                 });
@@ -379,12 +419,17 @@ namespace Infrastructure.Migrations
                     b.Property<int>("QuantidadePosterior")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("TipoMovimentacao")
                         .HasColumnType("int");
 
                     b.HasKey("IDMovimentacao");
 
                     b.HasIndex("IDProduto");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("MovimentacaoEstoques");
                 });
@@ -434,6 +479,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StatusProduto")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IDProduto");
 
                     b.HasIndex("IDCategoria");
@@ -441,6 +489,8 @@ namespace Infrastructure.Migrations
                     b.HasIndex("IDColecao");
 
                     b.HasIndex("IDJogoTCG");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Produtos");
                 });

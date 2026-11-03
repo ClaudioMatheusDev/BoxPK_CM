@@ -2,7 +2,7 @@
 
 namespace Application.Dtos
 {
-    public class CompraCriaDto
+    public class CompraCriarDto
     {
         public int IDFornecedor { get; set; }
         public DateTime DataCompra { get; set; }

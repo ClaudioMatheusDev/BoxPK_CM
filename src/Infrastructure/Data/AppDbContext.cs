@@ -1,4 +1,5 @@
-﻿using Application.Users;
+using Application.Common;
+using Application.Users;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -8,9 +9,17 @@ namespace Infrastructure.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        private static readonly string TenantProperty = "TenantId";
+        private static readonly HashSet<Type> TenantEntityTypes = new();
+        private readonly ITenantProvider _tenantProvider;
+
+        public AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvider tenantProvider) : base(options)
         {
+            _tenantProvider = tenantProvider;
         }
+
+        /// <summary>TenantId atual, usado pelos filtros globais de consulta (avaliado por instância do contexto).</summary>
+        private Guid CurrentTenantId => _tenantProvider.TenantId;
 
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Colecao> Colecoes { get; set; }
@@ -97,6 +106,58 @@ namespace Infrastructure.Data
                 .WithMany(p => p.ItensCompra)
                 .HasForeignKey(i => i.IDProduto)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            ConfigurarTenant<Categoria>(modelBuilder);
+            ConfigurarTenant<Colecao>(modelBuilder);
+            ConfigurarTenant<Compra>(modelBuilder);
+            ConfigurarTenant<ItemCompra>(modelBuilder);
+            ConfigurarTenant<Estoque>(modelBuilder);
+            ConfigurarTenant<MovimentacaoEstoque>(modelBuilder);
+            ConfigurarTenant<Fornecedor>(modelBuilder);
+            ConfigurarTenant<Jogo>(modelBuilder);
+            ConfigurarTenant<Produto>(modelBuilder);
+
+            modelBuilder.Entity<Estoque>()
+                .Property(e => e.RowVersion)
+                .IsRowVersion();
+        }
+
+        /// <summary>
+        /// Isolamento multi-tenant: cada entidade de negócio ganha uma coluna de sombra TenantId
+        /// e um filtro global que só devolve registros do tenant do usuário autenticado.
+        /// </summary>
+        private void ConfigurarTenant<TEntity>(ModelBuilder modelBuilder) where TEntity : class
+        {
+            TenantEntityTypes.Add(typeof(TEntity));
+            modelBuilder.Entity<TEntity>().Property<Guid>(TenantProperty);
+            modelBuilder.Entity<TEntity>().HasIndex(TenantProperty);
+            modelBuilder.Entity<TEntity>().HasQueryFilter(e => EF.Property<Guid>(e, TenantProperty) == CurrentTenantId);
+        }
+
+        private void AplicarTenant()
+        {
+            foreach (var entry in ChangeTracker.Entries().Where(e => e.State == EntityState.Added))
+            {
+                // Só entidades de negócio: ApplicationUser (Identity) possui a própria propriedade TenantId.
+                if (!TenantEntityTypes.Contains(entry.Entity.GetType())) continue;
+
+                if (CurrentTenantId == Guid.Empty)
+                    throw new InvalidOperationException("Operação exige um usuário autenticado com TenantId.");
+
+                entry.Property(TenantProperty).CurrentValue = CurrentTenantId;
+            }
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            AplicarTenant();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            AplicarTenant();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -10,9 +10,9 @@ namespace WebApi.Controllers.Estoque
     [Authorize]
     public class MovimentacaoEstoqueController : Controller
     {
-        private readonly IMovimentacaoEstoque _movimentacaoEstoque;
+        private readonly IMovimentacaoEstoqueService _movimentacaoEstoque;
 
-        public MovimentacaoEstoqueController(IMovimentacaoEstoque movimentacaoEstoque)
+        public MovimentacaoEstoqueController(IMovimentacaoEstoqueService movimentacaoEstoque)
         {
             _movimentacaoEstoque = movimentacaoEstoque;
         }
@@ -22,14 +22,15 @@ namespace WebApi.Controllers.Estoque
         {
             var movimentacao = await _movimentacaoEstoque.CriarMovimentacaoEstoque(movimentacaoEstoqueCriarDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = movimentacao });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarMovimentacoes()
+        public async Task<IActionResult> ListarMovimentacoes([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var movimentacao = await _movimentacaoEstoque.ListarMovimentacao();
-            return Ok(movimentacao);
+            var resultado = await _movimentacaoEstoque.ListarMovimentacao(page, pageSize);
+
+            return Ok(resultado);
         }
 
         [HttpGet("{IDMovimentacao}")]
@@ -50,9 +51,9 @@ namespace WebApi.Controllers.Estoque
         [HttpDelete("{IDMovimentacao}")]
         public async Task<IActionResult> DeletarMovimentacao(int IDMovimentacao)
         {
-            var movimentacao = await _movimentacaoEstoque.DeletarMovimentacaoEstoque(IDMovimentacao);
+            await _movimentacaoEstoque.DeletarMovimentacaoEstoque(IDMovimentacao);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

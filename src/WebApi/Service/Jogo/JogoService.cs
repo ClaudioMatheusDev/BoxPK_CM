@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Application.Dtos.Jogo;
 using Domain.Entities;
 using Domain.Enums;
@@ -33,9 +34,10 @@ namespace WebApi.Service
             return jogo.IDJogoTCG;
         }
 
-        public async Task<List<Jogo>> ListarJogos()
+        public async Task<List<Jogo>> ListarJogos(int? page = null, int? pageSize = null)
         {
-            var jogo = await _context.Jogos.ToListAsync();
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var jogo = await _context.Jogos.AsNoTracking().OrderBy(x => x.IDJogoTCG).Skip(skip).Take(take).ToListAsync();
 
             return jogo;
         }
@@ -46,7 +48,7 @@ namespace WebApi.Service
 
             if (jogo is null)
             {
-                throw new Exception("Não há jogo cadastrados.");
+                throw new NotFoundException("Não há jogo cadastrados.");
             }
 
             return jogo;
@@ -58,7 +60,7 @@ namespace WebApi.Service
 
             if (jogo is null)
             {
-                throw new Exception("Jogo não encontrado");
+                throw new NotFoundException("Jogo não encontrado");
             }
 
             jogo.Nome = jogoAtualizarDto.Nome;
@@ -78,7 +80,7 @@ namespace WebApi.Service
 
             if (jogo is null)
             {
-                throw new Exception("Jogo não encontrado");
+                throw new NotFoundException("Jogo não encontrado");
             }
 
             _context.Remove(jogo);

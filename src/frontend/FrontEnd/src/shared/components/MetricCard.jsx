@@ -1,9 +1,9 @@
-export function MetricCard({ label, value, detail }) {
+export function MetricCard({ label, value, detail, tone }) {
   return (
-    <article className="metric-card">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
+    <article className={`metric${tone ? ` metric-${tone}` : ''}`}>
+      <span className="metric-label">{label}</span>
+      <strong className="metric-value">{value}</strong>
+      {detail ? <small className="metric-detail">{detail}</small> : null}
     </article>
   )
 }

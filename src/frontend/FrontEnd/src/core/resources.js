@@ -27,7 +27,7 @@ export const statusOptions = {
   ],
   tipoMovimentacao: [
     { value: 1, label: 'Entrada' },
-    { value: 2, label: 'Saida' },
+    { value: 2, label: 'Saída' },
   ],
 }
 
@@ -42,12 +42,12 @@ export const resourceDefinitions = {
     updateStatusKey: 'statusCategoria',
     fields: [
       { name: 'nome', label: 'Nome', required: true },
-      { name: 'descricao', label: 'Descricao', type: 'textarea' },
+      { name: 'descricao', label: 'Descrição', type: 'textarea' },
     ],
     columns: [
       { key: 'idCategoria', label: 'ID' },
       { key: 'nome', label: 'Nome' },
-      { key: 'descricao', label: 'Descricao' },
+      { key: 'descricao', label: 'Descrição' },
       { key: 'statusCategoria', label: 'Status', format: 'statusCategoria' },
     ],
   },
@@ -94,10 +94,10 @@ export const resourceDefinitions = {
     ],
   },
   colecoes: {
-    title: 'Colecoes',
+    title: 'Coleções',
     endpoint: '/api/colecao',
     idKey: 'idColecao',
-    emptyLabel: 'colecao',
+    emptyLabel: 'coleção',
     lookupLabelKeys: ['nome', 'sigla'],
     createDefaults: { nome: '', sigla: '', idJogoTCG: '', dataLancamento: '' },
     updateStatusKey: 'statusColecao',
@@ -105,14 +105,14 @@ export const resourceDefinitions = {
       { name: 'nome', label: 'Nome', required: true },
       { name: 'sigla', label: 'Sigla' },
       { name: 'idJogoTCG', label: 'Jogo', lookup: 'jogos', required: true },
-      { name: 'dataLancamento', label: 'Lancamento', type: 'date', required: true },
+      { name: 'dataLancamento', label: 'Lançamento', type: 'date', required: true },
     ],
     columns: [
       { key: 'idColecao', label: 'ID' },
       { key: 'nome', label: 'Nome' },
       { key: 'sigla', label: 'Sigla' },
       { key: 'idJogoTCG', label: 'Jogo', lookup: 'jogos' },
-      { key: 'dataLancamento', label: 'Lancamento', format: 'date' },
+      { key: 'dataLancamento', label: 'Lançamento', format: 'date' },
       { key: 'statusColecao', label: 'Status', format: 'statusColecao' },
     ],
   },
@@ -135,19 +135,19 @@ export const resourceDefinitions = {
     updateStatusKey: 'statusProduto',
     fields: [
       { name: 'nome', label: 'Nome', required: true },
-      { name: 'descricao', label: 'Descricao', type: 'textarea' },
+      { name: 'descricao', label: 'Descrição', type: 'textarea' },
       { name: 'precoCusto', label: 'Custo', type: 'number', step: '0.01', required: true },
       { name: 'precoVenda', label: 'Venda', type: 'number', step: '0.01', required: true },
       { name: 'idCategoria', label: 'Categoria', lookup: 'categorias', required: true },
       { name: 'idJogoTCG', label: 'Jogo', lookup: 'jogos', required: true },
-      { name: 'idColecao', label: 'Colecao', lookup: 'colecoes' },
+      { name: 'idColecao', label: 'Coleção', lookup: 'colecoes' },
       {
         name: 'imagemUrl',
         label: 'URL da imagem',
         type: 'url',
         maxLength: 2048,
         placeholder: 'https://exemplo.com/imagem.jpg',
-        help: 'Use um link publico da imagem. Evite colar base64/data:image.',
+        help: 'Use um link público da imagem. Evite colar base64/data:image.',
       },
     ],
     columns: [

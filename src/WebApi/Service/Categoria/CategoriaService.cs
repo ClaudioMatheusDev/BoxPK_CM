@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+using Application.Dtos;
+using Application.Exceptions;
 using Application.Dtos.Categoria;
 using Domain.Entities;
 using Domain.Enums;
@@ -33,13 +34,14 @@ namespace WebApi.Service
             return categoria.IDCategoria;
         }
 
-        public async Task<List<Categoria>> ListarCategorias()
+        public async Task<List<Categoria>> ListarCategorias(int? page = null, int? pageSize = null)
         {
-            var categoria = await _context.Categorias.ToListAsync();
+            var (skip, take) = Application.Common.PagedQuery.Normalize(page, pageSize);
+            var categoria = await _context.Categorias.AsNoTracking().OrderBy(x => x.IDCategoria).Skip(skip).Take(take).ToListAsync();
 
             if (categoria is null)
             {
-                throw new Exception("Não há categoria cadastrados.");
+                throw new NotFoundException("Não há categoria cadastrados.");
             }
 
             return categoria;
@@ -52,7 +54,7 @@ namespace WebApi.Service
 
             if (categoria is null)
             {
-                throw new Exception("Não há categoria cadastrados.");
+                throw new NotFoundException("Não há categoria cadastrados.");
             }
 
             return categoria;
@@ -65,7 +67,7 @@ namespace WebApi.Service
 
             if (categoria is null)
             {
-                throw new Exception("Nenhuma categoria encontra nessa ID");
+                throw new NotFoundException("Nenhuma categoria encontra nessa ID");
             }
 
             categoria.Nome = categoriaAtualizarDto.Nome;
@@ -86,7 +88,7 @@ namespace WebApi.Service
 
             if (categoria is null)
             {
-                throw new Exception("Nenhuma categoria encontra nessa ID");
+                throw new NotFoundException("Nenhuma categoria encontra nessa ID");
             }
 
             _context.Remove(categoria);

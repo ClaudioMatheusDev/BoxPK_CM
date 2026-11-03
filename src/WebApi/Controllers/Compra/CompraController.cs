@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Service;
@@ -18,19 +18,19 @@ namespace WebApi.Controllers.Compra
         }
 
         [HttpPost]
-        public async Task<IActionResult> CriarCompra(CompraCriaDto compraCriaDto)
+        public async Task<IActionResult> CriarCompra(CompraCriarDto compraCriaDto)
         {
             var compra = await _compraService.CriarCompra(compraCriaDto);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status201Created, new { id = compra });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarCompras()
+        public async Task<IActionResult> ListarCompras([FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var compra = await _compraService.ListarCompras();
+            var resultado = await _compraService.ListarCompras(page, pageSize);
 
-            return Ok(compra);
+            return Ok(resultado);
         }
 
         [HttpGet("{IDCompra}")]
@@ -44,17 +44,17 @@ namespace WebApi.Controllers.Compra
         [HttpPut("{IDCompra}")]
         public async Task<IActionResult> AtualizarCompra(int IDCompra, CompraAtualizarDto compraAtualizarDto)
         {
-            var compra = await _compraService.AtualizarCompraPorID(IDCompra, compraAtualizarDto);
+            await _compraService.AtualizarCompraPorID(IDCompra, compraAtualizarDto);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete("{IDCompra}")]
         public async Task<IActionResult> DeletarCompra(int IDCompra)
         {
-            var compra = await _compraService.DeletarCompra(IDCompra);
+            await _compraService.DeletarCompra(IDCompra);
 
-            return Ok();
+            return NoContent();
         }
 
 
