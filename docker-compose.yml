@@ -28,6 +28,7 @@ services:
       Auth__AllowRegistration: ${ALLOW_REGISTRATION:-true}
       Seed__Enabled: ${SEED_DATABASE:-false}
       Seed__DemoData: ${SEED_DEMO_DATA:-true}
+      Seed__AllowDemoDataInProduction: ${SEED_DEMO_DATA_IN_PRODUCTION:-false}
       Seed__AdminEmail: ${SEED_ADMIN_EMAIL:-admin@boxtcg.local}
       Seed__AdminPassword: ${SEED_ADMIN_PASSWORD:-}
       Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:5173}

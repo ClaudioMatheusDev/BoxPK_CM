@@ -151,6 +151,7 @@ A API pode criar, na inicialização, um usuário administrador padrão e popula
 | `SEED_ADMIN_EMAIL` | `Seed__AdminEmail` | `admin@boxtcg.local` | E-mail/usuário do administrador |
 | `SEED_ADMIN_PASSWORD` | `Seed__AdminPassword` | — | Senha do administrador (obrigatória com os seeds ligados) |
 | `SEED_DEMO_DATA` | `Seed__DemoData` | `true` | Popula o tenant do administrador com os dados de demonstração |
+| `SEED_DEMO_DATA_IN_PRODUCTION` | `Seed__AllowDemoDataInProduction` | `false` | Permite criar os dados de demonstração em `Production` |
 
 O que é criado:
 
@@ -162,7 +163,7 @@ O que é criado:
 - 5 compras (confirmadas, pendente e cancelada) com itens
 - Estoque e movimentações derivados das compras confirmadas e de vendas, com o status de cada produto coerente com o saldo
 
-Os dados de demonstração ficam no tenant do administrador, portanto só aparecem ao entrar com essa conta. Em `Production` apenas o administrador é criado; os dados de demonstração são ignorados.
+Os dados de demonstração ficam no tenant do administrador, portanto só aparecem ao entrar com essa conta. Em `Production` apenas o administrador é criado, a menos que `SEED_DEMO_DATA_IN_PRODUCTION=true`.
 
 Para rodar localmente sem Docker:
 

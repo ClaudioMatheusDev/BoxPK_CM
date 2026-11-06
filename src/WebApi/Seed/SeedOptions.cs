@@ -19,5 +19,11 @@ namespace WebApi.Seed
 
         /// <summary>Popula o tenant do administrador com o catálogo de demonstração (cartas Pokémon, compras, estoque).</summary>
         public bool DemoData { get; set; } = true;
+
+        /// <summary>
+        /// Por segurança, os dados de demonstração não são criados em Production.
+        /// Defina true (Seed__AllowDemoDataInProduction) para criá-los mesmo assim, ex.: em uma vitrine/homologação.
+        /// </summary>
+        public bool AllowDemoDataInProduction { get; set; }
     }
 }
