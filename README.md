@@ -141,6 +141,37 @@ Para parar e remover também o volume do banco:
 docker compose down -v
 ```
 
+## Seeds (admin padrão e dados de demonstração)
+
+A API pode criar, na inicialização, um usuário administrador padrão e popular a plataforma com dados de demonstração de uma loja de cartas Pokémon. Os seeds são idempotentes: rodar de novo não duplica nada.
+
+| Variável (`.env`) | Configuração da API | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `SEED_DATABASE` | `Seed__Enabled` | `false` | Liga os seeds |
+| `SEED_ADMIN_EMAIL` | `Seed__AdminEmail` | `admin@boxtcg.local` | E-mail/usuário do administrador |
+| `SEED_ADMIN_PASSWORD` | `Seed__AdminPassword` | — | Senha do administrador (obrigatória com os seeds ligados) |
+| `SEED_DEMO_DATA` | `Seed__DemoData` | `true` | Popula o tenant do administrador com os dados de demonstração |
+
+O que é criado:
+
+- Usuário administrador (e-mail confirmado) no papel `Admin`, com tenant próprio
+- Jogo **Pokémon Estampas Ilustradas** e 14 coleções (Escarlate e Violeta até Rivais Predestinados, além de Origem Perdida inativa)
+- 8 categorias (Carta Avulsa, Booster, Elite Trainer Box, Booster Box, Coleção Especial, Deck, Acessórios e Carta Graduada desabilitada)
+- 5 fornecedores fictícios (domínios `example.com`)
+- 29 cartas avulsas (Charizard ex, Umbreon ex, Pikachu ex, Iono...) com imagem do pokemontcg.io e 11 produtos selados/acessórios
+- 5 compras (confirmadas, pendente e cancelada) com itens
+- Estoque e movimentações derivados das compras confirmadas e de vendas, com o status de cada produto coerente com o saldo
+
+Os dados de demonstração ficam no tenant do administrador, portanto só aparecem ao entrar com essa conta. Em `Production` apenas o administrador é criado; os dados de demonstração são ignorados.
+
+Para rodar localmente sem Docker:
+
+```bash
+Seed__Enabled=true Seed__AdminPassword='TroqueEstaSenha@123' dotnet run --project src/WebApi/WebApi.csproj
+```
+
+> Troque a senha do administrador padrão e não use os valores de exemplo em ambientes reais.
+
 ## Executando a API localmente
 
 Restaure e compile a solução:

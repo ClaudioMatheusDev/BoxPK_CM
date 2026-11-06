@@ -26,6 +26,10 @@ services:
       APPLY_MIGRATIONS: "true"
       Jwt__Key: ${Jwt__Key}
       Auth__AllowRegistration: ${ALLOW_REGISTRATION:-true}
+      Seed__Enabled: ${SEED_DATABASE:-false}
+      Seed__DemoData: ${SEED_DEMO_DATA:-true}
+      Seed__AdminEmail: ${SEED_ADMIN_EMAIL:-admin@boxtcg.local}
+      Seed__AdminPassword: ${SEED_ADMIN_PASSWORD:-}
       Cors__AllowedOrigins__0: ${CORS_ORIGIN:-http://localhost:5173}
       Cors__AllowedOrigins__1: http://127.0.0.1:5173
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=BoxPK_CM;User Id=sa;Password=${SA_PASSWORD};Encrypt=False;TrustServerCertificate=True
