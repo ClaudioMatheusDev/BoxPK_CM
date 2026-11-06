@@ -51,9 +51,11 @@ namespace WebApi.Seed
             if (!_options.DemoData)
                 return;
 
-            if (_environment.IsProduction())
+            if (_environment.IsProduction() && !_options.AllowDemoDataInProduction)
             {
-                _logger.LogWarning("Seed: dados de demonstração ignorados no ambiente de produção.");
+                _logger.LogWarning(
+                    "Seed: dados de demonstração ignorados no ambiente de produção. " +
+                    "Defina Seed__AllowDemoDataInProduction=true (SEED_DEMO_DATA_IN_PRODUCTION) para criá-los.");
                 return;
             }
 
