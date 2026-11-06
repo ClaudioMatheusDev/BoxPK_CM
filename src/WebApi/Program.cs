@@ -17,6 +17,7 @@ using WebApi.Middleware;
 using WebApi.Service;
 using WebApi.Service.Auditoria;
 using WebApi.Service.Auth;
+using WebApi.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -119,6 +120,9 @@ builder.Services.AddScoped<IMovimentacaoEstoqueService, MovimentacaoEstoqueServi
 builder.Services.AddScoped<ICompraService, CompraService>();
 builder.Services.AddScoped<IItemCompraService, ItemCompraService>();
 
+builder.Services.Configure<SeedOptions>(builder.Configuration.GetSection(SeedOptions.SectionName));
+builder.Services.AddScoped<DatabaseSeeder>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
@@ -132,6 +136,13 @@ if (app.Configuration.GetValue<bool>("APPLY_MIGRATIONS"))
 
     var auditDbContext = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
     await auditDbContext.Database.MigrateAsync();
+}
+
+// Seeds (admin padrão + dados de demonstração): habilitar com Seed:Enabled=true (variável Seed__Enabled).
+if (app.Configuration.GetValue<bool>("Seed:Enabled"))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<DatabaseSeeder>().SeedAsync();
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
